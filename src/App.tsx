@@ -41,7 +41,6 @@ import type {
   RecentFileEntry,
   SavedProject,
   StringHeuristicCategory,
-  TestSuiteItemResult,
   WorkerLogEntry,
 } from './types';
 import { GhidraWasmEngine, RizinJsdecEngine } from './engines/engine-manager';
@@ -162,23 +161,39 @@ export default function App() {
 
     loadRecentFiles().then(setRecentFiles).catch(() => {});
 
-    // Automatically load the first sample binary on startup so the workbench is immediately alive
-    (async () => {
-      try {
-        const resp = await fetch(SAMPLE_BINARIES[0].path);
-        if (resp.ok) {
-          const buf = await resp.arrayBuffer();
-          await loadBinaryBuffer(new Uint8Array(buf), SAMPLE_BINARIES[0].filename);
-        }
-      } catch {
-        // Ignore initial auto-load error
-      }
-    })();
-
     return () => {
       engA.cancelAndRestart();
       engB.cancelAndRestart();
     };
+  }, []);
+
+  const loadSampleBinary = useCallback(async (sampleId: string = 'gfwl-setup') => {
+    const smp = SAMPLE_BINARIES.find((s) => s.id === sampleId) || SAMPLE_BINARIES[0];
+    const candidateUrls = [
+      smp.path,
+      './samples/' + smp.filename,
+      'samples/' + smp.filename,
+      '/tools/easy-decompiler/samples/' + smp.filename,
+      '/samples/' + smp.filename,
+    ];
+    setIsAnalyzing(true);
+    setStatusMessage(`Fetching authentic sample binary (${smp.filename})...`);
+    for (const url of candidateUrls) {
+      try {
+        const resp = await fetch(url);
+        if (resp.ok) {
+          const ct = resp.headers.get('content-type') || '';
+          if (ct.includes('text/html')) continue;
+          const buf = await resp.arrayBuffer();
+          await loadBinaryBuffer(new Uint8Array(buf), smp.filename);
+          return;
+        }
+      } catch {
+        // try next candidate
+      }
+    }
+    setIsAnalyzing(false);
+    setStatusMessage(`Failed to locate ${smp.filename} across candidate paths.`);
   }, []);
 
   // Sync theme & settings
@@ -756,9 +771,7 @@ export default function App() {
                       type="button"
                       onClick={async () => {
                         setOpenMenu(null);
-                        const r = await fetch(smp.path);
-                        const b = await r.arrayBuffer();
-                        await loadBinaryBuffer(new Uint8Array(b), smp.filename);
+                        await loadSampleBinary(smp.id);
                       }}
                       className="flex w-full items-center justify-between px-3 py-1.5 text-left text-xs text-slate-300 hover:bg-white/10 hover:text-white"
                     >
@@ -1026,14 +1039,9 @@ export default function App() {
                 SAMPLE_BINARIES.find((s) => s.filename === analysis?.metadata.filename)?.id || ''
               }
               onChange={async (e) => {
-                const found = SAMPLE_BINARIES.find((s) => s.id === e.target.value);
-                if (found) {
-                  const r = await fetch(found.path);
-                  const b = await r.arrayBuffer();
-                  await loadBinaryBuffer(new Uint8Array(b), found.filename);
-                }
+                await loadSampleBinary(e.target.value);
               }}
-              className="rounded border border-white/15 bg-[#05070B] px-2 py-1 text-xs text-slate-200 focus:border-[#00E5FF] focus:outline-none"
+              className="rounded border border-[#27272a] bg-[#121214] px-2 py-1 text-xs text-zinc-200 focus:border-[#38bdf8] focus:outline-none"
             >
               <option value="" disabled>
                 Choose built-in binary...
@@ -1391,7 +1399,47 @@ export default function App() {
 
           {/* Center Content Area */}
           <div className="min-h-0 flex-1 overflow-hidden">
-            {centerTab === 'dual-decompiler' && (
+            {!analysis ? (
+              <div className="flex h-full flex-col items-center justify-center p-8 bg-[#09090b] text-center select-none">
+                <div className="flex max-w-lg flex-col items-center gap-5 p-8 border border-[#27272a] bg-[#121214] rounded-sm">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-[#38bdf8]/40 bg-[#38bdf8]/10 text-[#38bdf8]">
+                    <Binary className="h-6 w-6" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <h2 className="text-sm font-semibold text-zinc-100 tracking-tight font-ui">
+                      Spet&apos;s Easy Decompiler
+                    </h2>
+                    <p className="text-xs text-zinc-400 max-w-sm leading-relaxed">
+                      100% Client-Side WebAssembly Binary Analysis & Dual C-Like Decompiler (Rizin + Ghidra).
+                      Local-first execution inside sandboxed Web Workers with zero server telemetry.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 rounded-sm bg-[#38bdf8] px-3.5 py-1.5 text-xs font-semibold text-zinc-950 hover:bg-[#38bdf8]/90 transition-colors"
+                    >
+                      <FolderOpen className="h-3.5 w-3.5" />
+                      <span>Open Local Binary File</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => loadSampleBinary('gfwl-setup')}
+                      className="inline-flex items-center gap-1.5 rounded-sm border border-[#27272a] bg-[#18181b] px-3.5 py-1.5 text-xs font-semibold text-zinc-200 hover:bg-zinc-800 transition-colors"
+                    >
+                      <Cpu className="h-3.5 w-3.5 text-[#38bdf8]" />
+                      <span>Load Sample (GFWL Setup x86 PE32)</span>
+                    </button>
+                  </div>
+                  <div className="pt-3 border-t border-[#27272a] text-[11px] text-zinc-500 font-mono">
+                    Supported: PE32 / PE64 (.exe, .dll) · ELF32 / ELF64 · Mach-O · WebAssembly
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {centerTab === 'dual-decompiler' && (
               <div className="grid h-full grid-cols-1 divide-y divide-[var(--border-hairline)] lg:grid-cols-2 lg:divide-x lg:divide-y-0">
                 {/* Engine A Pane: Rizin + jsdec */}
                 <div className="flex h-full min-h-0 flex-col overflow-hidden">
@@ -1571,6 +1619,8 @@ export default function App() {
                 sections={analysis?.sections || []}
                 fontClass={fontClass}
               />
+            )}
+              </>
             )}
           </div>
 

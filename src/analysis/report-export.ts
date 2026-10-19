@@ -91,7 +91,7 @@ export function generateMarkdownReport(
 ): string {
   const m = analysis.metadata;
   return `# Binary Reverse Engineering Report — ${m.filename}
-Generated locally by **Spet's Online Easy Online Decompiler** (100% Client-Side WebAssembly)
+Generated locally by **Spet's Easy Decompiler** (100% Client-Side WebAssembly)
 
 ## 1. Binary Metadata
 | Property | Value |

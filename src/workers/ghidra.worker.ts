@@ -54,25 +54,46 @@ function escapeXml(str: string): string {
 async function fetchGhidraArtifact(
   filename: string
 ): Promise<{ text: string; buffer: ArrayBuffer; json?: any }> {
-  const candidates: string[] = [
-    `/wasm/${filename}`,
-    `./wasm/${filename}`,
-    `wasm/${filename}`,
-    `../wasm/${filename}`,
-  ];
+  const cleanRel = filename.replace(/^\/+/, '');
+  const candidates: string[] = [];
+
+  try {
+    if (typeof self !== 'undefined' && self.location && self.location.href) {
+      candidates.push(new URL(`../wasm/${cleanRel}`, self.location.href).href);
+      candidates.push(new URL(`wasm/${cleanRel}`, self.location.href).href);
+      candidates.push(new URL(`./wasm/${cleanRel}`, self.location.href).href);
+      candidates.push(new URL(`../${cleanRel}`, self.location.href).href);
+    }
+  } catch {}
+
+  candidates.push(
+    `./wasm/${cleanRel}`,
+    `wasm/${cleanRel}`,
+    `../wasm/${cleanRel}`,
+    `/tools/easy-decompiler/wasm/${cleanRel}`,
+    `/wasm/${cleanRel}`
+  );
 
   for (const url of candidates) {
     try {
       const resp = await fetch(url);
       if (resp.ok) {
+        const ct = resp.headers.get('content-type') || '';
+        if (ct.includes('text/html')) continue;
         const buffer = await resp.arrayBuffer();
+        if (cleanRel.endsWith('.wasm')) {
+          const header = new Uint8Array(buffer, 0, Math.min(4, buffer.byteLength));
+          if (header.length < 4 || header[0] !== 0x00 || header[1] !== 0x61 || header[2] !== 0x73 || header[3] !== 0x6d) {
+            continue;
+          }
+        }
         const text = new TextDecoder().decode(buffer);
         let json: any = undefined;
-        if (filename.endsWith('.json')) {
+        if (cleanRel.endsWith('.json')) {
           try {
             json = JSON.parse(text);
           } catch {
-            // ignore
+            continue;
           }
         }
         return { text, buffer, json };
@@ -103,7 +124,13 @@ async function ensureGhidraLoaded(): Promise<void> {
 
   ghidraMod = await self.GhidraDecompiler({
     wasmBinary: new Uint8Array(wasmArt.buffer),
-    locateFile: (p: string) => `/wasm/${p}`,
+    locateFile: (p: string) => {
+      try {
+        return new URL(`../wasm/${p}`, self.location.href).href;
+      } catch {
+        return `wasm/${p}`;
+      }
+    },
     print: () => {},
     printErr: () => {},
   });
