@@ -63,6 +63,12 @@ import {
   ShortcutsModal,
 } from './components/Modals';
 import { PwaInstallButton } from './components/PwaInstallButton';
+import { THEMES, ThemeId, DEFAULT_THEME } from './theme';
+
+const getBaseUrl = (): string => {
+  const meta = import.meta as unknown as { env?: { BASE_URL?: string } };
+  return meta.env?.BASE_URL || './';
+};
 
 const SAMPLE_BINARIES = [
   {
@@ -238,11 +244,12 @@ const DecompilerCodePane: React.FC<DecompilerCodePaneProps> = ({
       {/* Pane Header */}
       <div className="h-[26px] shrink-0 flex items-center justify-between border-b border-[#182232] bg-[#0c121d] px-2 text-[11px] font-mono select-none">
         <div className="flex items-center gap-1.5 truncate">
-          <span
-            className={`h-1.5 w-1.5 shrink-0 ${
-              engineId === 'rizin-jsdec' ? 'bg-[#38bdf8]' : 'bg-[#c084fc]'
-            }`}
-          />
+          <span className="text-[10px] font-bold text-[#00e5ff] shrink-0 font-mono">
+            {engineId === 'rizin-jsdec' ? '[A: RIZIN+JSDEC]' : '[B: GHIDRA SLEIGH]'}
+          </span>
+          {isEngineError && (
+            <span className="text-rose-400 font-bold shrink-0 font-mono">[!]</span>
+          )}
           <span className="font-semibold text-slate-200 truncate">{engineName}</span>
           {typeof durationMs === 'number' && (
             <span className="text-[#64748b]">({durationMs} ms)</span>
@@ -377,6 +384,21 @@ export default function App() {
   const [fnCategoryFilter, setFnCategoryFilter] = useState<FunctionCategory | 'all' | 'favorites'>('all');
   const [stringSearch, setStringSearch] = useState('');
   const [stringCategoryFilter, setStringCategoryFilter] = useState<StringHeuristicCategory | 'all'>('all');
+
+  // Theme Engine
+  const [currentTheme, setCurrentTheme] = useState<ThemeId>(() => {
+    const saved = localStorage.getItem('spet-decompiler-theme');
+    if (saved === 'oled' || saved === 'slade' || saved === 'cobalt' || saved === 'ida') {
+      return saved as ThemeId;
+    }
+    return DEFAULT_THEME;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('spet-decompiler-theme', currentTheme);
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    document.body.setAttribute('data-theme', currentTheme);
+  }, [currentTheme]);
 
   // Active Tabs & Menus
   const [centerTab, setCenterTab] = useState<CenterTab>('dual-decompiler');
@@ -993,8 +1015,16 @@ export default function App() {
       {/* ============================================================== */}
       <header className="h-[28px] shrink-0 bg-[#06090f] border-b border-[#182232] px-2.5 flex items-center justify-between text-[11px] font-mono z-30 select-none">
         {/* Left: Tool Brand + Menu Triggers */}
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold text-[#38bdf8] tracking-wider pr-1">SPET::DECOMPILER</span>
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 pr-2 select-none">
+            <img
+              src={`${getBaseUrl()}icons/executable-0.png`}
+              alt=""
+              className="pixelated shrink-0 w-3.5 h-3.5"
+            />
+            <span className="font-sans font-bold tracking-tight text-[#00e5ff]">Spet's</span>
+            <span className="font-mono font-semibold text-slate-100 tracking-tight">Easy Online Decompiler</span>
+          </div>
 
           <nav className="relative flex items-center gap-0.5 text-[11px]">
             {/* FILE MENU */}
@@ -1232,6 +1262,24 @@ export default function App() {
                     </button>
                   ))}
                   <div className="my-1 border-t border-[#182232]" />
+                  <div className="px-3 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#64748b]">
+                    UI Color Theme
+                  </div>
+                  {THEMES.map((th) => (
+                    <button
+                      key={th.id}
+                      type="button"
+                      onClick={() => {
+                        setCurrentTheme(th.id);
+                        setOpenMenu(null);
+                      }}
+                      className="flex w-full items-center justify-between px-3 py-1 text-left text-slate-200 hover:bg-[#111a29]"
+                    >
+                      <span>{th.name}</span>
+                      {currentTheme === th.id && <Check className="h-3 w-3 text-[#38bdf8]" />}
+                    </button>
+                  ))}
+                  <div className="my-1 border-t border-[#182232]" />
                   <button
                     type="button"
                     onClick={() => {
@@ -1322,7 +1370,7 @@ export default function App() {
           </nav>
         </div>
 
-        {/* Center/Right: Active Telemetry + Sample Selector + Load Button */}
+        {/* Center/Right: Active Telemetry + Theme Switcher + Sample Selector + Load Button */}
         <div className="flex items-center gap-2">
           {/* Inline Active Binary Telemetry */}
           <div className="hidden xl:flex items-center gap-1.5 text-[11px] text-[#64748b] truncate max-w-xl">
@@ -1341,6 +1389,22 @@ export default function App() {
             ) : (
               <span>Target: (No binary loaded)</span>
             )}
+          </div>
+
+          {/* Theme Selector */}
+          <div className="flex items-center gap-1 shrink-0">
+            <span className="text-[10px] text-[#64748b]">Theme:</span>
+            <select
+              value={currentTheme}
+              onChange={(e) => setCurrentTheme(e.target.value as ThemeId)}
+              className="h-[20px] px-1 bg-[#090d14] border border-[#182232] text-[10px] text-slate-300 font-mono focus:border-[#38bdf8] focus:outline-none"
+            >
+              {THEMES.map((th) => (
+                <option key={th.id} value={th.id}>
+                  {th.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Compact sample selector dropdown */}
@@ -1365,9 +1429,13 @@ export default function App() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="h-[20px] px-2 bg-[#111a29] border border-[#26354d] hover:border-[#38bdf8] text-[10px] text-slate-200 font-mono flex items-center gap-1 cursor-pointer"
+              className="h-[20px] px-2 bg-[#111a29] border border-[#26354d] hover:border-[#38bdf8] text-[10px] text-slate-200 font-mono flex items-center gap-1.5 cursor-pointer"
             >
-              <FolderOpen className="h-2.5 w-2.5 text-[#38bdf8]" />
+              <img
+                src={`${getBaseUrl()}icons/directory_open_file_mydocs-4.png`}
+                alt=""
+                className="pixelated shrink-0 w-3 h-3"
+              />
               <span>[Load File]</span>
             </button>
           </div>
@@ -1462,7 +1530,11 @@ export default function App() {
           {/* Header Strip */}
           <div className="h-[24px] bg-[#0c121d] border-b border-[#182232] px-2 flex items-center justify-between text-[11px] font-mono text-slate-300 font-semibold shrink-0">
             <div className="flex items-center gap-1.5 truncate">
-              <Layers className="h-3 w-3 text-[#38bdf8]" />
+              <img
+                src={`${getBaseUrl()}icons/console_prompt-0.png`}
+                alt=""
+                className="pixelated shrink-0 w-3.5 h-3.5"
+              />
               <span className="truncate">FUNCTIONS ({filteredFunctions.length})</span>
             </div>
             <div className="flex items-center gap-1">
@@ -1546,8 +1618,13 @@ export default function App() {
                   </span>
 
                   {/* Col 2: Name (flex-1) */}
-                  <span className={`flex-1 truncate pr-1 ${isSelected ? 'text-[#38bdf8] font-bold' : 'text-[#e2e8f0]'}`}>
-                    {activeName}
+                  <span className={`flex-1 truncate pr-1 flex items-center gap-1 ${isSelected ? 'text-[#38bdf8] font-bold' : 'text-[#e2e8f0]'}`}>
+                    <img
+                      src={`${getBaseUrl()}icons/console_prompt-0.png`}
+                      alt=""
+                      className="pixelated shrink-0 w-3 h-3 opacity-70"
+                    />
+                    <span className="truncate">{activeName}</span>
                   </span>
 
                   {/* Inline comment icon if present */}
@@ -1607,32 +1684,31 @@ export default function App() {
         {/* ============================================================== */}
         <main className="flex-1 flex flex-col min-w-0 bg-[#080b11] overflow-hidden">
           {/* Flush Rectangular IDE Dock Tabs */}
-          <div className="h-[28px] shrink-0 bg-[#06090f] border-b border-[#182232] flex items-center justify-between select-none">
-            <div className="flex items-center h-full">
+          <div className="h-[28px] shrink-0 bg-[#06090f] border-b border-[#182232] flex items-center justify-between select-none overflow-x-auto no-scrollbar">
+            <div className="flex items-center h-full shrink-0">
               {(
                 [
-                  ['dual-decompiler', 'Dual C Decompilers', Sparkles],
-                  ['decompiler-a', 'Rizin + jsdec', Terminal],
-                  ['decompiler-b', 'Ghidra WASM', Cpu],
-                  ['disassembly', 'Disassembly', FileCode2],
-                  ['cfg', 'CFG Graph', GitBranch],
-                  ['callgraph', 'Call Graph', Network],
-                  ['hex', 'Hex View', Binary],
-                ] as Array<[CenterTab, string, any]>
-              ).map(([id, label, Icon]) => {
+                  ['dual-decompiler', '[DUAL] Dual C View'],
+                  ['decompiler-a', '[A: RIZIN+JSDEC]'],
+                  ['decompiler-b', '[B: GHIDRA SLEIGH]'],
+                  ['disassembly', '[ASM] Disassembly'],
+                  ['cfg', '[CFG]'],
+                  ['callgraph', '[CALL] Call Graph'],
+                  ['hex', '[HEX]'],
+                ] as Array<[CenterTab, string]>
+              ).map(([id, label]) => {
                 const active = centerTab === id;
                 return (
                   <button
                     key={id}
                     type="button"
                     onClick={() => setCenterTab(id)}
-                    className={`h-full px-3 text-[11px] font-mono flex items-center gap-1.5 transition-colors cursor-pointer border-r border-[#182232] ${
+                    className={`h-full px-3 text-[11px] font-mono whitespace-nowrap shrink-0 flex items-center gap-1.5 transition-colors cursor-pointer border-r border-[#182232] ${
                       active
-                        ? 'text-white bg-[#090d14] border-t-2 border-t-[#38bdf8]'
+                        ? 'text-white bg-[#090d14] border-t-2 border-t-[#38bdf8] font-bold'
                         : 'text-slate-400 hover:bg-[#0c121d] hover:text-slate-200'
                     }`}
                   >
-                    <Icon className="h-3 w-3" />
                     <span>{label}</span>
                   </button>
                 );
@@ -1757,26 +1833,34 @@ export default function App() {
               <div className="flex h-full flex-col items-center justify-center p-3 bg-[#06090f] text-center select-none font-mono">
                 <div className="max-w-md p-3 border border-[#182232] bg-[#090d14]">
                   <div className="text-xs font-bold text-[#38bdf8] uppercase tracking-wider mb-1">
-                    Spet&apos;s Easy Decompiler
+                    Spet&apos;s Easy Online Decompiler
                   </div>
                   <p className="text-[11px] text-slate-400 leading-normal mb-3">
-                    100% Client-Side WebAssembly Binary Analysis & Dual C-Like Decompiler (Rizin + Ghidra).
+                    Local WebAssembly Binary Analysis &amp; Dual C-Like Decompiler (Rizin + Ghidra).
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="h-[22px] px-2.5 bg-[#111a29] border border-[#38bdf8] text-[#38bdf8] text-[10px] font-mono hover:bg-[#38bdf8]/20 flex items-center gap-1"
+                      className="h-[22px] px-2.5 bg-[#111a29] border border-[#38bdf8] text-[#38bdf8] text-[10px] font-mono hover:bg-[#38bdf8]/20 flex items-center gap-1.5 cursor-pointer"
                     >
-                      <FolderOpen className="h-2.5 w-2.5" />
+                      <img
+                        src={`${getBaseUrl()}icons/directory_open_file_mydocs-4.png`}
+                        alt=""
+                        className="pixelated shrink-0 w-3 h-3"
+                      />
                       <span>[Open Binary File]</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => loadSampleBinary('gfwl-setup')}
-                      className="h-[22px] px-2.5 bg-[#090d14] border border-[#182232] text-slate-300 text-[10px] font-mono hover:border-slate-400 flex items-center gap-1"
+                      className="h-[22px] px-2.5 bg-[#090d14] border border-[#182232] text-slate-300 text-[10px] font-mono hover:border-slate-400 flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Cpu className="h-2.5 w-2.5 text-amber-400" />
+                      <img
+                        src={`${getBaseUrl()}icons/executable-0.png`}
+                        alt=""
+                        className="pixelated shrink-0 w-3 h-3"
+                      />
                       <span>[Load GFWL Sample]</span>
                     </button>
                   </div>
@@ -2011,7 +2095,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-1.5 text-[11px] font-mono">
+              <div className="flex-1 min-h-0 overflow-y-auto p-1.5 text-[11px] font-mono">
                 {bottomTab === 'logs' && (
                   <div className="space-y-0.5">
                     {logs.map((l) => (
@@ -2367,7 +2451,7 @@ export default function App() {
       {/* ============================================================== */}
       {/* ZONE E: Global Footer Status Bar (h-[22px])                    */}
       {/* ============================================================== */}
-      <footer className="h-[22px] shrink-0 bg-[#05070b] border-t border-[#182232] px-3 flex items-center justify-between text-[10px] font-mono text-slate-400 select-none">
+      <footer className="h-[22px] shrink-0 z-20 bg-[#05070b] border-t border-[#182232] px-3 flex items-center justify-between text-[10px] font-mono text-slate-400 select-none">
         <div className="flex items-center gap-2 truncate">
           <span className="inline-flex items-center gap-1.5">
             <span
@@ -2407,7 +2491,7 @@ export default function App() {
             <span>[Console: {isBottomDockOpen ? 'Hide' : 'Show'}]</span>
           </button>
           <span className="text-[#34d399] flex items-center gap-1 font-semibold">
-            ● 100% Local WASM Sandbox (Zero Network I/O)
+            [Sandbox ID: WASM_LOCAL // NO_NET]
           </span>
         </div>
       </footer>
