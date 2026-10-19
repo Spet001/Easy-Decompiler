@@ -169,6 +169,7 @@ function renderHighlightedCodeLine(
 
 interface DecompilerCodePaneProps {
   code: string;
+  errors?: string[];
   isLoading: boolean;
   loadingMessage: string;
   engineName: string;
@@ -179,6 +180,7 @@ interface DecompilerCodePaneProps {
   onCopy: () => void;
   onDownload: () => void;
   onSwitchToGhidra?: () => void;
+  onSwitchToRizin?: () => void;
   onSwitchToDisasm?: () => void;
   onJumpFunction?: (name: string) => void;
   baseAddress?: string;
@@ -187,6 +189,7 @@ interface DecompilerCodePaneProps {
 
 const DecompilerCodePane: React.FC<DecompilerCodePaneProps> = ({
   code,
+  errors,
   isLoading,
   loadingMessage,
   engineName,
@@ -197,20 +200,26 @@ const DecompilerCodePane: React.FC<DecompilerCodePaneProps> = ({
   onCopy,
   onDownload,
   onSwitchToGhidra,
+  onSwitchToRizin,
   onSwitchToDisasm,
   onJumpFunction,
   baseAddress,
   fontClass,
 }) => {
   const isEngineError = useMemo(() => {
+    if (errors && errors.length > 0) return true;
     if (!code) return false;
+    const lower = code.toLowerCase();
     return (
-      code.includes('// Engine A error:') ||
-      code.includes('// Engine B error:') ||
-      code.includes('Cannot read properties of undefined') ||
-      code.includes('AST Control-Flow recovery incomplete')
+      lower.includes('engine a error') ||
+      lower.includes('engine b error') ||
+      lower.includes('cannot read properties of undefined') ||
+      lower.includes('ast control-flow recovery incomplete') ||
+      lower.includes('worker request failed') ||
+      lower.includes('typeerror') ||
+      (code.trim().startsWith('//') && lower.includes('error'))
     );
-  }, [code]);
+  }, [code, errors]);
 
   const lines = useMemo(() => {
     if (!code) return [];
@@ -266,21 +275,23 @@ const DecompilerCodePane: React.FC<DecompilerCodePaneProps> = ({
 
       {/* Pane Body */}
       {isLoading ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-4 bg-[#06090f] text-center select-none font-mono">
+        <div className="flex-1 flex flex-col items-center justify-center p-3 bg-[#06090f] text-center select-none font-mono">
           <div className="flex items-center gap-2 text-xs text-[#38bdf8]">
             <span className="h-2 w-2 animate-ping bg-[#38bdf8]" />
             <span>{loadingMessage}</span>
           </div>
         </div>
       ) : isEngineError ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[#06090f] text-center select-none font-mono">
-          <div className="max-w-md p-4 bg-[#090d14] border border-[#182232] text-left">
+        <div className="flex-1 flex flex-col items-center justify-center p-3 bg-[#06090f] text-center select-none font-mono">
+          <div className="max-w-md p-3 bg-[#090d14] border border-[#182232] text-left">
             <div className="flex items-center gap-2 text-[#f59e0b] font-bold text-xs mb-2">
               <AlertTriangle className="h-4 w-4 shrink-0" />
               <span>[DECOMPILER ENGINE NOTICE]</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-relaxed mb-3">
-              AST Control-Flow recovery incomplete for this frame — fallback to Disassembly / Engine B active.
+              {engineId === 'rizin-jsdec'
+                ? 'AST Control-Flow recovery incomplete for this frame — fallback to Disassembly / Engine B active.'
+                : 'AST Control-Flow recovery incomplete for this frame — fallback to Disassembly / Engine A active.'}
             </p>
             <div className="flex items-center gap-2">
               {onSwitchToGhidra && (
@@ -290,6 +301,15 @@ const DecompilerCodePane: React.FC<DecompilerCodePaneProps> = ({
                   className="h-[22px] px-2.5 bg-[#111a29] border border-[#38bdf8] text-[#38bdf8] text-[11px] hover:bg-[#38bdf8]/20 flex items-center gap-1"
                 >
                   [Switch to Full Ghidra View]
+                </button>
+              )}
+              {onSwitchToRizin && (
+                <button
+                  type="button"
+                  onClick={onSwitchToRizin}
+                  className="h-[22px] px-2.5 bg-[#111a29] border border-[#38bdf8] text-[#38bdf8] text-[11px] hover:bg-[#38bdf8]/20 flex items-center gap-1"
+                >
+                  [Switch to Full Rizin View]
                 </button>
               )}
               {onSwitchToDisasm && (
@@ -1542,6 +1562,12 @@ export default function App() {
 
                   {/* Action icons revealed ONLY on group hover */}
                   <div className="hidden group-hover:flex items-center gap-1 shrink-0">
+                    <span
+                      className="text-[9px] px-1 py-0.2 border border-[#182232] bg-[#06090f] text-[#38bdf8] uppercase tracking-wider rounded-[2px]"
+                      title={`Category: ${fn.category}`}
+                    >
+                      {fn.category.slice(0, 4)}
+                    </span>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1728,29 +1754,29 @@ export default function App() {
           {/* Primary Viewport */}
           <div className="flex-1 min-h-0 overflow-hidden bg-[#080b11]">
             {!analysis ? (
-              <div className="flex h-full flex-col items-center justify-center p-6 bg-[#06090f] text-center select-none font-mono">
-                <div className="max-w-md p-6 border border-[#182232] bg-[#090d14]">
+              <div className="flex h-full flex-col items-center justify-center p-3 bg-[#06090f] text-center select-none font-mono">
+                <div className="max-w-md p-3 border border-[#182232] bg-[#090d14]">
                   <div className="text-xs font-bold text-[#38bdf8] uppercase tracking-wider mb-1">
                     Spet&apos;s Easy Decompiler
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-normal mb-4">
+                  <p className="text-[11px] text-slate-400 leading-normal mb-3">
                     100% Client-Side WebAssembly Binary Analysis & Dual C-Like Decompiler (Rizin + Ghidra).
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="h-[24px] px-3 bg-[#111a29] border border-[#38bdf8] text-[#38bdf8] text-[11px] font-mono hover:bg-[#38bdf8]/20 flex items-center gap-1"
+                      className="h-[22px] px-2.5 bg-[#111a29] border border-[#38bdf8] text-[#38bdf8] text-[10px] font-mono hover:bg-[#38bdf8]/20 flex items-center gap-1"
                     >
-                      <FolderOpen className="h-3 w-3" />
+                      <FolderOpen className="h-2.5 w-2.5" />
                       <span>[Open Binary File]</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => loadSampleBinary('gfwl-setup')}
-                      className="h-[24px] px-3 bg-[#090d14] border border-[#182232] text-slate-300 text-[11px] font-mono hover:border-slate-400 flex items-center gap-1"
+                      className="h-[22px] px-2.5 bg-[#090d14] border border-[#182232] text-slate-300 text-[10px] font-mono hover:border-slate-400 flex items-center gap-1"
                     >
-                      <Cpu className="h-3 w-3 text-amber-400" />
+                      <Cpu className="h-2.5 w-2.5 text-amber-400" />
                       <span>[Load GFWL Sample]</span>
                     </button>
                   </div>
@@ -1763,6 +1789,7 @@ export default function App() {
                   <div className="grid h-full grid-cols-1 divide-y divide-[#182232] lg:grid-cols-2 lg:divide-x lg:divide-y-0">
                     <DecompilerCodePane
                       code={formattedCodeA}
+                      errors={decompA?.errors}
                       isLoading={isDecompilingA}
                       loadingMessage="Running Rizin + jsdec AST control-flow structuring..."
                       engineName="Decompiler A: Rizin v0.9.1 + jsdec v0.9.0"
@@ -1787,6 +1814,7 @@ export default function App() {
 
                     <DecompilerCodePane
                       code={formattedCodeB}
+                      errors={decompB?.errors}
                       isLoading={isDecompilingB}
                       loadingMessage="Lifting P-Code & running Ghidra SSA decompiler..."
                       engineName="Decompiler B: Ghidra C++ Sleigh WASM (v11.2)"
@@ -1802,7 +1830,7 @@ export default function App() {
                           'text/x-c'
                         )
                       }
-                      onSwitchToGhidra={() => setCenterTab('decompiler-b')}
+                      onSwitchToRizin={() => setCenterTab('decompiler-a')}
                       onSwitchToDisasm={() => setCenterTab('disassembly')}
                       onJumpFunction={jumpToFunctionByNameOrAddr}
                       baseAddress={selectedFnAddr}
@@ -1815,6 +1843,7 @@ export default function App() {
                 {centerTab === 'decompiler-a' && (
                   <DecompilerCodePane
                     code={formattedCodeA}
+                    errors={decompA?.errors}
                     isLoading={isDecompilingA}
                     loadingMessage="Running Rizin + jsdec AST control-flow structuring..."
                     engineName="Decompiler A: Rizin v0.9.1 + jsdec v0.9.0"
@@ -1842,6 +1871,7 @@ export default function App() {
                 {centerTab === 'decompiler-b' && (
                   <DecompilerCodePane
                     code={formattedCodeB}
+                    errors={decompB?.errors}
                     isLoading={isDecompilingB}
                     loadingMessage="Lifting P-Code & running Ghidra SSA decompiler..."
                     engineName="Decompiler B: Ghidra C++ Sleigh WASM (v11.2)"
@@ -1857,6 +1887,7 @@ export default function App() {
                         'text/x-c'
                       )
                     }
+                    onSwitchToRizin={() => setCenterTab('decompiler-a')}
                     onSwitchToDisasm={() => setCenterTab('disassembly')}
                     onJumpFunction={jumpToFunctionByNameOrAddr}
                     baseAddress={selectedFnAddr}
@@ -2367,6 +2398,14 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsBottomDockOpen((v) => !v)}
+            className="h-[18px] px-1.5 bg-[#111a29] border border-[#182232] hover:border-[#38bdf8] text-slate-300 hover:text-white text-[9px] font-mono flex items-center gap-1 cursor-pointer"
+            title="Toggle Bottom Console (Worker Log & Shell)"
+          >
+            <span>[Console: {isBottomDockOpen ? 'Hide' : 'Show'}]</span>
+          </button>
           <span className="text-[#34d399] flex items-center gap-1 font-semibold">
             ● 100% Local WASM Sandbox (Zero Network I/O)
           </span>
