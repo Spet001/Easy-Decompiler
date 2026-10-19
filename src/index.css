@@ -2,70 +2,63 @@
 
 @layer base {
   :root {
-    --bg-canvas: #09090b;
-    --bg-panel: #121214;
-    --bg-elevated: #18181b;
-    --text-primary: #f4f4f5;
-    --text-secondary: #a1a1aa;
-    --text-muted: #71717a;
+    --bg-canvas: #06090f;
+    --bg-panel: #090d14;
+    --bg-header: #0c121d;
+    --bg-active: #111a29;
+    --text-primary: #cbd5e1;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
     --accent-cyan: #38bdf8;
-    --accent-violet: #818cf8;
-    --border-hairline: #27272a;
-  }
-
-  html.light {
-    --bg-canvas: #fafafa;
-    --bg-panel: #ffffff;
-    --bg-elevated: #f4f4f5;
-    --text-primary: #09090b;
-    --text-secondary: #52525b;
-    --text-muted: #71717a;
-    --accent-cyan: #0284c7;
-    --accent-violet: #6366f1;
-    --border-hairline: #e4e4e7;
+    --accent-amber: #f59e0b;
+    --border-hairline: #182232;
   }
 
   html, body, #root {
     height: 100%;
     max-height: 100%;
     overflow: hidden;
+    background-color: #06090f;
+    color: #cbd5e1;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #3f3f46 transparent;
+    scrollbar-color: #182232 #06090f;
   }
 
   *::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   *::-webkit-scrollbar-track {
-    background: transparent;
+    background: #06090f;
   }
 
   *::-webkit-scrollbar-thumb {
-    background: #27272a;
-    border-radius: 2px;
+    background: #182232;
+    border-radius: 0px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: #3f3f46;
+    background: #26354d;
   }
 }
 
 .font-ui {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .font-mono-jetbrains {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-variant-numeric: tabular-nums;
 }
 
 .font-mono-ibm {
-  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-variant-numeric: tabular-nums;
 }
 

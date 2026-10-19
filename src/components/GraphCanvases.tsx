@@ -63,32 +63,32 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
 
   if (!cfg || cfg.blocks.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-slate-400">
+      <div className="flex h-full items-center justify-center text-xs text-slate-400 font-mono">
         Select a function to inspect its Control Flow Graph (CFG).
       </div>
     );
   }
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#05070B]">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#06090f]">
       {/* Toolbar */}
-      <div className="z-10 flex items-center justify-between border-b border-white/10 bg-[#0B0F17]/90 px-3 py-1.5 text-xs">
+      <div className="z-10 flex items-center justify-between border-b border-[#182232] bg-[#0c121d] px-2.5 py-1 text-xs shrink-0 select-none">
         <div className="flex items-center gap-3">
-          <span className="font-mono-jetbrains font-semibold text-[#00E5FF]">
+          <span className="font-mono font-semibold text-[#38bdf8]">
             CFG: {cfg.functionName} ({cfg.functionAddress})
           </span>
-          <span className="text-slate-400">
+          <span className="text-[#64748b] font-mono text-[11px]">
             {cfg.blocks.length} basic blocks · {cfg.edges.length} edges
           </span>
           <div className="hidden items-center gap-2 sm:flex">
-            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" /> True Branch
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[#34d399]">
+              <span className="h-1.5 w-1.5 bg-[#34d399]" /> True Branch
             </span>
-            <span className="inline-flex items-center gap-1 text-[11px] text-rose-400">
-              <span className="h-2 w-2 rounded-full bg-rose-400" /> False Branch
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[#f87171]">
+              <span className="h-1.5 w-1.5 bg-[#f87171]" /> False Branch
             </span>
-            <span className="inline-flex items-center gap-1 text-[11px] text-[#00E5FF]">
-              <span className="h-2 w-2 rounded-full bg-[#00E5FF]" /> Unconditional
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[#38bdf8]">
+              <span className="h-1.5 w-1.5 bg-[#38bdf8]" /> Unconditional
             </span>
           </div>
         </div>
@@ -96,18 +96,18 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
           <button
             type="button"
             onClick={() => setZoom((z) => Math.min(2.2, +(z + 0.15).toFixed(2)))}
-            className="rounded border border-white/10 bg-white/5 p-1 text-slate-300 hover:border-[#00E5FF]/50 hover:text-white"
+            className="border border-[#182232] bg-[#090d14] p-1 text-slate-300 hover:border-[#38bdf8] hover:text-white"
             title="Zoom In"
           >
-            <ZoomIn className="h-3.5 w-3.5" />
+            <ZoomIn className="h-3 w-3" />
           </button>
           <button
             type="button"
             onClick={() => setZoom((z) => Math.max(0.4, +(z - 0.15).toFixed(2)))}
-            className="rounded border border-white/10 bg-white/5 p-1 text-slate-300 hover:border-[#00E5FF]/50 hover:text-white"
+            className="border border-[#182232] bg-[#090d14] p-1 text-slate-300 hover:border-[#38bdf8] hover:text-white"
             title="Zoom Out"
           >
-            <ZoomOut className="h-3.5 w-3.5" />
+            <ZoomOut className="h-3 w-3" />
           </button>
           <button
             type="button"
@@ -115,10 +115,10 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
               setZoom(1);
               setPan({ x: 0, y: 0 });
             }}
-            className="rounded border border-white/10 bg-white/5 p-1 text-slate-300 hover:border-[#00E5FF]/50 hover:text-white"
+            className="border border-[#182232] bg-[#090d14] p-1 text-slate-300 hover:border-[#38bdf8] hover:text-white"
             title="Reset View"
           >
-            <RotateCcw className="h-3.5 w-3.5" />
+            <RotateCcw className="h-3 w-3" />
           </button>
           <button
             type="button"
@@ -126,9 +126,9 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
               const svg = generateCfgSvg(cfg);
               downloadLocalBlob(svg, `${cfg.functionName}-cfg.svg`, 'image/svg+xml');
             }}
-            className="ml-1 inline-flex items-center gap-1 rounded border border-[#00E5FF]/30 bg-[#00E5FF]/10 px-2 py-1 text-[11px] font-medium text-[#00E5FF] hover:bg-[#00E5FF]/20"
+            className="ml-1 inline-flex items-center gap-1 border border-[#182232] bg-[#111a29] px-2 py-0.5 text-[10px] font-mono text-[#38bdf8] hover:border-[#38bdf8]"
           >
-            <Download className="h-3 w-3" /> SVG
+            <Download className="h-2.5 w-2.5" /> SVG
           </button>
         </div>
       </div>
@@ -167,7 +167,7 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399" />
             </marker>
             <marker
               id="arrow-false"
@@ -178,7 +178,7 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#EF4444" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171" />
             </marker>
             <marker
               id="arrow-uncond"
@@ -189,7 +189,7 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#00E5FF" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
             </marker>
           </defs>
 
@@ -200,7 +200,7 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
             const x2 = e.toNode.x + e.toNode.w / 2;
             const y2 = e.toNode.y;
             const stroke =
-              e.type === 'true' ? '#10B981' : e.type === 'false' ? '#EF4444' : '#00E5FF';
+              e.type === 'true' ? '#34d399' : e.type === 'false' ? '#f87171' : '#38bdf8';
             const marker =
               e.type === 'true'
                 ? 'url(#arrow-true)'
@@ -214,7 +214,7 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
                 d={`M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`}
                 fill="none"
                 stroke={stroke}
-                strokeWidth={2}
+                strokeWidth={1.6}
                 strokeDasharray={e.type === 'loop' ? '5,4' : undefined}
                 markerEnd={marker}
               />
@@ -225,12 +225,12 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
           {layout.nodes.map((node) => {
             const isSelected = selectedBlock === node.address;
             const borderColor = node.isEntry
-              ? '#00E5FF'
+              ? '#38bdf8'
               : node.isExit
-                ? '#8B5CF6'
+                ? '#c084fc'
                 : isSelected
-                  ? '#F59E0B'
-                  : '#334155';
+                  ? '#f59e0b'
+                  : '#182232';
             return (
               <g
                 key={node.address}
@@ -246,25 +246,27 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
                   y={node.y}
                   width={node.w}
                   height={node.h}
-                  rx={6}
-                  fill="#0B0F17"
+                  rx={0}
+                  fill="#090d14"
                   stroke={borderColor}
-                  strokeWidth={isSelected ? 2.2 : 1.4}
+                  strokeWidth={isSelected ? 2 : 1}
                 />
                 <rect
                   x={node.x}
                   y={node.y}
                   width={node.w}
-                  height={26}
-                  rx={6}
-                  fill={node.isEntry ? 'rgba(0, 229, 255, 0.14)' : 'rgba(139, 92, 246, 0.12)'}
+                  height={24}
+                  rx={0}
+                  fill={node.isEntry ? 'rgba(56, 189, 248, 0.15)' : 'rgba(192, 132, 252, 0.12)'}
+                  stroke={borderColor}
+                  strokeWidth={1}
                 />
                 <text
-                  x={node.x + 10}
-                  y={node.y + 17}
-                  fill={node.isEntry ? '#00E5FF' : '#E2E8F0'}
-                  fontFamily="JetBrains Mono, monospace"
-                  fontSize="11.5"
+                  x={node.x + 8}
+                  y={node.y + 16}
+                  fill={node.isEntry ? '#38bdf8' : '#e2e8f0'}
+                  fontFamily="'JetBrains Mono', monospace"
+                  fontSize="11"
                   fontWeight="bold"
                 >
                   {node.label} @ {node.address} ({node.size}B)
@@ -272,14 +274,14 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
                 {node.instructions.slice(0, 10).map((ins, idx) => (
                   <text
                     key={`${ins.address}-${idx}`}
-                    x={node.x + 10}
-                    y={node.y + 42 + idx * 17}
-                    fill="#CBD5E1"
-                    fontFamily="JetBrains Mono, monospace"
+                    x={node.x + 8}
+                    y={node.y + 39 + idx * 17}
+                    fill="#cbd5e1"
+                    fontFamily="'JetBrains Mono', monospace"
                     fontSize="11"
                   >
-                    <tspan fill="#64748B">{ins.address.padEnd(10)}</tspan>{' '}
-                    <tspan fill="#E2E8F0">{ins.disasm.slice(0, 38)}</tspan>
+                    <tspan fill="#64748b">{ins.address.padEnd(10)}</tspan>{' '}
+                    <tspan fill="#e2e8f0">{ins.disasm.slice(0, 38)}</tspan>
                   </text>
                 ))}
               </g>
@@ -306,7 +308,7 @@ export const CallGraphCanvasView: React.FC<CallGraphCanvasViewProps> = ({
 
   if (!callGraph || callGraph.nodes.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-slate-400">
+      <div className="flex h-full items-center justify-center text-xs text-slate-400 font-mono">
         No call graph nodes available.
       </div>
     );
@@ -317,24 +319,24 @@ export const CallGraphCanvasView: React.FC<CallGraphCanvasViewProps> = ({
     const row = Math.floor(idx / 3);
     return {
       ...n,
-      x: 50 + col * 280,
-      y: 44 + row * 86,
-      w: 230,
-      h: 50,
+      x: 40 + col * 280,
+      y: 40 + row * 80,
+      w: 240,
+      h: 46,
     };
   });
 
   const nodeMap = new Map(nodes.map((n) => [n.address, n]));
-  const height = Math.max(420, Math.ceil(nodes.length / 3) * 95 + 80);
+  const height = Math.max(420, Math.ceil(nodes.length / 3) * 85 + 60);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-[#05070B]">
-      <div className="flex items-center justify-between border-b border-white/10 bg-[#0B0F17]/90 px-3 py-1.5 text-xs">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-[#06090f]">
+      <div className="flex items-center justify-between border-b border-[#182232] bg-[#0c121d] px-2.5 py-1 text-xs shrink-0 select-none">
         <div className="flex items-center gap-3">
-          <span className="font-mono-jetbrains font-semibold text-[#8B5CF6]">
+          <span className="font-mono font-semibold text-[#c084fc]">
             Interactive Call Graph
           </span>
-          <span className="text-slate-400">
+          <span className="text-[#64748b] font-mono text-[11px]">
             {callGraph.nodes.length} functions · {callGraph.edges.length} call edges
           </span>
         </div>
@@ -342,16 +344,16 @@ export const CallGraphCanvasView: React.FC<CallGraphCanvasViewProps> = ({
           <button
             type="button"
             onClick={() => setZoom((z) => Math.min(2, +(z + 0.15).toFixed(2)))}
-            className="rounded border border-white/10 bg-white/5 p-1 text-slate-300 hover:text-white"
+            className="border border-[#182232] bg-[#090d14] p-1 text-slate-300 hover:text-white"
           >
-            <ZoomIn className="h-3.5 w-3.5" />
+            <ZoomIn className="h-3 w-3" />
           </button>
           <button
             type="button"
             onClick={() => setZoom((z) => Math.max(0.5, +(z - 0.15).toFixed(2)))}
-            className="rounded border border-white/10 bg-white/5 p-1 text-slate-300 hover:text-white"
+            className="border border-[#182232] bg-[#090d14] p-1 text-slate-300 hover:text-white"
           >
-            <ZoomOut className="h-3.5 w-3.5" />
+            <ZoomOut className="h-3 w-3" />
           </button>
           <button
             type="button"
@@ -359,9 +361,9 @@ export const CallGraphCanvasView: React.FC<CallGraphCanvasViewProps> = ({
               const svg = generateCallGraphSvg(callGraph);
               downloadLocalBlob(svg, 'callgraph.svg', 'image/svg+xml');
             }}
-            className="ml-1 inline-flex items-center gap-1 rounded border border-[#8B5CF6]/40 bg-[#8B5CF6]/15 px-2 py-1 text-[11px] font-medium text-[#C4B5FD] hover:bg-[#8B5CF6]/25"
+            className="ml-1 inline-flex items-center gap-1 border border-[#182232] bg-[#111a29] px-2 py-0.5 text-[10px] font-mono text-[#c084fc] hover:border-[#c084fc]"
           >
-            <Download className="h-3 w-3" /> SVG
+            <Download className="h-2.5 w-2.5" /> SVG
           </button>
         </div>
       </div>
@@ -384,9 +386,9 @@ export const CallGraphCanvasView: React.FC<CallGraphCanvasViewProps> = ({
                   b.x + b.w / 2
                 } ${(a.y + b.y) / 2}, ${b.x + b.w / 2} ${b.y}`}
                 fill="none"
-                stroke="#00E5FF"
+                stroke="#38bdf8"
                 strokeOpacity={0.65}
-                strokeWidth={1.8}
+                strokeWidth={1.5}
               />
             );
           })}
@@ -404,27 +406,27 @@ export const CallGraphCanvasView: React.FC<CallGraphCanvasViewProps> = ({
                   y={n.y}
                   width={n.w}
                   height={n.h}
-                  rx={6}
-                  fill={active ? 'rgba(0, 229, 255, 0.14)' : '#0B0F17'}
-                  stroke={active ? '#00E5FF' : '#8B5CF6'}
-                  strokeWidth={active ? 2.2 : 1.4}
+                  rx={0}
+                  fill={active ? '#111a29' : '#090d14'}
+                  stroke={active ? '#38bdf8' : '#182232'}
+                  strokeWidth={active ? 2 : 1}
                 />
                 <text
-                  x={n.x + 12}
-                  y={n.y + 21}
-                  fill={active ? '#00E5FF' : '#E2E8F0'}
-                  fontFamily="JetBrains Mono, monospace"
-                  fontSize="12"
+                  x={n.x + 10}
+                  y={n.y + 18}
+                  fill={active ? '#38bdf8' : '#e2e8f0'}
+                  fontFamily="'JetBrains Mono', monospace"
+                  fontSize="11.5"
                   fontWeight="bold"
                 >
                   {n.name.slice(0, 24)}
                 </text>
                 <text
-                  x={n.x + 12}
-                  y={n.y + 38}
-                  fill="#94A3B8"
-                  fontFamily="JetBrains Mono, monospace"
-                  fontSize="10.5"
+                  x={n.x + 10}
+                  y={n.y + 35}
+                  fill="#64748b"
+                  fontFamily="'JetBrains Mono', monospace"
+                  fontSize="10"
                 >
                   {n.address} · {n.category}
                 </text>

@@ -44,7 +44,7 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
 
   if (!data) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-slate-400">
+      <div className="flex h-full items-center justify-center text-xs text-slate-400 font-mono">
         Open a binary file to inspect raw hex bytes.
       </div>
     );
@@ -55,7 +55,6 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
     const clean = jumpInput.trim().replace(/^0x/i, '');
     const parsed = parseInt(clean, 16);
     if (!Number.isNaN(parsed)) {
-      // Check if user entered a virtual address inside a section
       let fileOff = parsed;
       for (const sec of sections) {
         if (
@@ -77,7 +76,6 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
     const q = searchHex.trim();
     if (!q) return;
 
-    // Search either hex byte sequence ("7f 45 4c 46") or ASCII substring
     const isHexPattern = /^[0-9a-fA-F\s]+$/.test(q) && q.replace(/\s+/g, '').length % 2 === 0;
     let needle: Uint8Array;
     if (isHexPattern) {
@@ -108,42 +106,42 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-[#05070B]">
+    <div className="flex h-full flex-col overflow-hidden bg-[#06090f]">
       {/* Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-[#0B0F17] px-3 py-2 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#182232] bg-[#0c121d] px-2.5 py-1 text-xs shrink-0 select-none">
         <div className="flex items-center gap-2">
           <form onSubmit={handleJump} className="flex items-center gap-1">
             <input
               type="text"
               value={jumpInput}
               onChange={(e) => setJumpInput(e.target.value)}
-              placeholder="Jump offset/vaddr (e.g. 0x1000)"
-              className="w-48 rounded border border-white/10 bg-[#05070B] px-2 py-1 text-xs text-slate-200 focus:border-[#00E5FF] focus:outline-none"
+              placeholder="Jump 0x offset/vaddr"
+              className="w-44 bg-[#06090f] border border-[#182232] px-2 py-0.5 text-[11px] font-mono text-slate-200 placeholder:text-slate-600 focus:border-[#38bdf8] focus:outline-none"
             />
             <button
               type="submit"
-              className="inline-flex items-center gap-1 rounded border border-[#00E5FF]/30 bg-[#00E5FF]/10 px-2 py-1 text-[#00E5FF] hover:bg-[#00E5FF]/20"
+              className="inline-flex items-center gap-1 border border-[#182232] bg-[#111a29] px-2 py-0.5 text-[10px] font-mono text-[#38bdf8] hover:border-[#38bdf8]"
             >
-              Go <ArrowRight className="h-3 w-3" />
+              Go <ArrowRight className="h-2.5 w-2.5" />
             </button>
           </form>
 
           <form onSubmit={handleSearch} className="flex items-center gap-1">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-2 top-1.5 h-3.5 w-3.5 text-slate-500" />
+              <Search className="pointer-events-none absolute left-2 top-1.5 h-3 w-3 text-slate-600" />
               <input
                 type="text"
                 value={searchHex}
                 onChange={(e) => setSearchHex(e.target.value)}
-                placeholder="Find hex (7f 45) or ASCII..."
-                className="w-48 rounded border border-white/10 bg-[#05070B] pl-7 pr-2 py-1 text-xs text-slate-200 focus:border-[#00E5FF] focus:outline-none"
+                placeholder="Find hex or ASCII..."
+                className="w-44 bg-[#06090f] border border-[#182232] pl-6 pr-2 py-0.5 text-[11px] font-mono text-slate-200 placeholder:text-slate-600 focus:border-[#38bdf8] focus:outline-none"
               />
             </div>
           </form>
         </div>
 
         {/* Section Quick Jump */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           {sections.slice(0, 5).map((s) => (
             <button
               key={s.name}
@@ -152,16 +150,16 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
                 setPageOffset(Math.floor(s.fileOffsetNum / 16) * 16);
                 setHighlightOffset(s.fileOffsetNum);
               }}
-              className="rounded border border-white/10 bg-white/5 px-2 py-0.5 font-mono-jetbrains text-[11px] text-slate-300 hover:border-[#00E5FF]/40 hover:text-[#00E5FF]"
+              className="border border-[#182232] bg-[#090d14] px-1.5 py-0.5 font-mono text-[10px] text-slate-300 hover:border-[#38bdf8] hover:text-[#38bdf8]"
             >
               {s.name}
             </button>
           ))}
-          <div className="ml-2 flex items-center gap-1">
+          <div className="ml-1 flex items-center gap-1">
             <button
               type="button"
               onClick={() => setPageOffset((p) => Math.max(0, p - pageBytes))}
-              className="rounded border border-white/10 bg-white/5 px-2 py-0.5 text-slate-300 hover:text-white"
+              className="border border-[#182232] bg-[#090d14] px-1.5 py-0.5 text-[10px] font-mono text-slate-300 hover:text-white"
             >
               Prev
             </button>
@@ -170,7 +168,7 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
               onClick={() =>
                 setPageOffset((p) => Math.min(Math.max(0, data.length - pageBytes), p + pageBytes))
               }
-              className="rounded border border-white/10 bg-white/5 px-2 py-0.5 text-slate-300 hover:text-white"
+              className="border border-[#182232] bg-[#090d14] px-1.5 py-0.5 text-[10px] font-mono text-slate-300 hover:text-white"
             >
               Next
             </button>
@@ -179,8 +177,8 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
       </div>
 
       {/* Hex Table */}
-      <div className={`flex-1 overflow-auto p-3 text-xs leading-5 ${fontClass}`}>
-        <div className="mb-1 flex border-b border-white/10 pb-1 text-[11px] font-semibold text-slate-500">
+      <div className={`flex-1 overflow-auto p-2 text-xs leading-5 ${fontClass}`}>
+        <div className="mb-1 flex border-b border-[#182232] pb-1 text-[11px] font-semibold text-[#64748b]">
           <span className="w-24">OFFSET</span>
           <span className="w-[390px]">00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F</span>
           <span>ASCII</span>
@@ -193,23 +191,23 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
           return (
             <div
               key={row.offset}
-              className={`flex items-center rounded px-1 py-0.5 ${
-                isHighlightedRow ? 'bg-[#00E5FF]/15' : 'hover:bg-white/[0.03]'
+              className={`flex items-center px-1 py-0.2 ${
+                isHighlightedRow ? 'bg-[#38bdf8]/15' : 'hover:bg-white/[0.03]'
               }`}
             >
-              <span className="w-24 select-all text-[#00E5FF]">
+              <span className="w-24 select-all text-[#38bdf8]">
                 0x{row.offset.toString(16).padStart(8, '0')}
               </span>
-              <span className="w-[390px] text-slate-200">
+              <span className="w-[390px] text-slate-300">
                 {row.hex.map((h, i) => (
                   <React.Fragment key={i}>
                     <span
                       className={
                         h === '00'
-                          ? 'text-slate-600'
+                          ? 'text-[#475569]'
                           : h === 'ff'
-                            ? 'text-amber-400'
-                            : 'text-slate-200'
+                            ? 'text-[#f59e0b]'
+                            : 'text-[#e2e8f0]'
                       }
                     >
                       {h}
@@ -218,7 +216,7 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
                   </React.Fragment>
                 ))}
               </span>
-              <span className="tracking-wider text-emerald-400/90">{row.ascii}</span>
+              <span className="tracking-wider text-[#34d399]">{row.ascii}</span>
             </div>
           );
         })}

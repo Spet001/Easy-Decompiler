@@ -34,12 +34,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-      <div className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-white/15 bg-[#0B0F17] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden border border-[#182232] bg-[#090d14] shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[#182232] bg-[#0c121d] px-4 py-2.5">
           <div className="flex items-center gap-2">
-            <Sliders className="h-4 w-4 text-[#00E5FF]" />
-            <h2 className="font-ui text-sm font-semibold text-white">
+            <Sliders className="h-4 w-4 text-[#38bdf8]" />
+            <h2 className="font-mono text-xs font-semibold text-white uppercase tracking-wider">
               Preferences & Analysis Settings
             </h2>
           </div>
@@ -47,35 +47,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <button
               type="button"
               onClick={() => onUpdate({ ...DEFAULT_SETTINGS })}
-              className="inline-flex items-center gap-1 rounded border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300 hover:border-white/25 hover:text-white"
+              className="inline-flex items-center gap-1 border border-[#182232] bg-[#111a29] px-2 py-0.5 text-[10px] font-mono text-slate-300 hover:text-white"
             >
-              <RotateCcw className="h-3 w-3" /> Reset to Defaults
+              <RotateCcw className="h-3 w-3" /> Reset Defaults
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+              className="p-1 text-slate-400 hover:text-white"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        <div className="grid flex-1 grid-cols-1 gap-5 overflow-y-auto p-5 text-xs md:grid-cols-2">
+        <div className="grid flex-1 grid-cols-1 gap-4 overflow-y-auto p-4 text-xs font-mono md:grid-cols-2">
           {/* Appearance & Fonts */}
-          <div className="space-y-3 rounded-md border border-white/10 bg-[#05070B]/70 p-3.5">
-            <h3 className="font-semibold uppercase tracking-wider text-[#00E5FF]">
+          <div className="space-y-2.5 border border-[#182232] bg-[#06090f] p-3">
+            <h3 className="font-semibold uppercase tracking-wider text-[#38bdf8] text-[11px]">
               Appearance & Typography
             </h3>
 
             <div className="flex items-center justify-between">
-              <span className="text-slate-300">Color Theme</span>
+              <span className="text-slate-400 text-[11px]">Color Theme</span>
               <select
                 value={settings.theme}
                 onChange={(e) =>
                   onUpdate({ ...settings, theme: e.target.value as 'dark' | 'light' })
                 }
-                className="rounded border border-white/15 bg-[#0B0F17] px-2 py-1 text-slate-200"
+                className="border border-[#182232] bg-[#090d14] px-2 py-0.5 text-[11px] text-slate-200"
               >
                 <option value="dark">Obsidian Forensics (Dark)</option>
                 <option value="light">Clean Daylight (Light)</option>
@@ -83,7 +83,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-slate-300">Monospace Code Font</span>
+              <span className="text-slate-400 text-[11px]">Monospace Code Font</span>
               <select
                 value={settings.monospaceCodeFont}
                 onChange={(e) =>
@@ -92,7 +92,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     monospaceCodeFont: e.target.value as AppSettings['monospaceCodeFont'],
                   })
                 }
-                className="rounded border border-white/15 bg-[#0B0F17] px-2 py-1 text-slate-200"
+                className="border border-[#182232] bg-[#090d14] px-2 py-0.5 text-[11px] text-slate-200"
               >
                 <option value="JetBrains Mono">JetBrains Mono</option>
                 <option value="IBM Plex Mono">IBM Plex Mono</option>
@@ -102,28 +102,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {(
               [
-                ['enhancedFonts', 'Enhanced Font Ligatures & Rendering'],
-                ['compactLayout', 'Compact High-Density Workspace'],
-                ['showBackgroundStars', 'Subtle Background Starfield Canvas'],
-                ['animations', 'Smooth UI Transitions'],
+                ['enhancedFonts', 'Enhanced Font Ligatures'],
+                ['compactLayout', 'Compact Workstation Grid'],
+                ['showBackgroundStars', 'Subtle Void Backdrop'],
+                ['animations', 'Interface Transitions'],
                 ['reducedMotion', 'Reduced Motion Mode'],
               ] as Array<[keyof AppSettings, string]>
             ).map(([k, label]) => (
-              <label key={k} className="flex cursor-pointer items-center justify-between py-0.5">
+              <label key={k} className="flex cursor-pointer items-center justify-between py-0.5 text-[11px]">
                 <span className="text-slate-300">{label}</span>
                 <input
                   type="checkbox"
                   checked={Boolean(settings[k])}
                   onChange={() => toggle(k)}
-                  className="h-3.5 w-3.5 accent-[#00E5FF]"
+                  className="h-3 w-3 accent-[#38bdf8]"
                 />
               </label>
             ))}
           </div>
 
           {/* Disassembly & Decompiler Display */}
-          <div className="space-y-3 rounded-md border border-white/10 bg-[#05070B]/70 p-3.5">
-            <h3 className="font-semibold uppercase tracking-wider text-[#8B5CF6]">
+          <div className="space-y-2.5 border border-[#182232] bg-[#06090f] p-3">
+            <h3 className="font-semibold uppercase tracking-wider text-[#c084fc] text-[11px]">
               Disassembly & Analysis Engine
             </h3>
 
@@ -131,27 +131,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               [
                 ['showAddresses', 'Show Virtual Addresses'],
                 ['showBytes', 'Show Instruction Opcode Bytes'],
-                ['showComments', 'Show Inline Cross-Ref & User Comments'],
-                ['showFunctionSignatures', 'Show Inferred Function Signatures'],
-                ['showAnalysisDetails', 'Show Deep Binary Metadata & Entropy'],
-                ['autoAnalyzeOnOpen', 'Auto-Analyze Binary on File Open'],
-                ['autoNameFunctions', 'IDA-Style Auto Function Naming (sub_*)'],
-                ['autoSaveProject', 'Auto-Save Project State to IndexedDB'],
+                ['showComments', 'Show Inline Comments'],
+                ['showFunctionSignatures', 'Inferred Function Signatures'],
+                ['showAnalysisDetails', 'Deep Metadata & Entropy'],
+                ['autoAnalyzeOnOpen', 'Auto-Analyze on File Open'],
+                ['autoNameFunctions', 'IDA-Style Auto Naming (sub_*)'],
+                ['autoSaveProject', 'Auto-Save to IndexedDB'],
               ] as Array<[keyof AppSettings, string]>
             ).map(([k, label]) => (
-              <label key={k} className="flex cursor-pointer items-center justify-between py-0.5">
+              <label key={k} className="flex cursor-pointer items-center justify-between py-0.5 text-[11px]">
                 <span className="text-slate-300">{label}</span>
                 <input
                   type="checkbox"
                   checked={Boolean(settings[k])}
                   onChange={() => toggle(k)}
-                  className="h-3.5 w-3.5 accent-[#8B5CF6]"
+                  className="h-3 w-3 accent-[#c084fc]"
                 />
               </label>
             ))}
 
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-slate-300">Minimum String Length</span>
+            <div className="flex items-center justify-between pt-1 text-[11px]">
+              <span className="text-slate-400">Min String Length</span>
               <input
                 type="number"
                 min={2}
@@ -163,12 +163,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     minStringLength: Math.max(2, parseInt(e.target.value, 10) || 4),
                   })
                 }
-                className="w-16 rounded border border-white/15 bg-[#0B0F17] px-2 py-1 text-right text-slate-200"
+                className="w-16 border border-[#182232] bg-[#090d14] px-1.5 py-0.5 text-right text-slate-200"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-slate-300">Worker Timeout (seconds)</span>
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-slate-400">Worker Timeout (s)</span>
               <input
                 type="number"
                 min={10}
@@ -180,7 +180,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     analysisTimeoutSec: Math.max(10, parseInt(e.target.value, 10) || 45),
                   })
                 }
-                className="w-16 rounded border border-white/15 bg-[#0B0F17] px-2 py-1 text-right text-slate-200"
+                className="w-16 border border-[#182232] bg-[#090d14] px-1.5 py-0.5 text-right text-slate-200"
               />
             </div>
           </div>
@@ -208,26 +208,28 @@ export const ShortcutsModal: React.FC<{ open: boolean; onClose: () => void }> = 
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg overflow-hidden rounded-lg border border-white/15 bg-[#0B0F17] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="w-full max-w-lg overflow-hidden border border-[#182232] bg-[#090d14] shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[#182232] bg-[#0c121d] px-4 py-2.5">
           <div className="flex items-center gap-2">
-            <Keyboard className="h-4 w-4 text-[#00E5FF]" />
-            <h2 className="font-ui text-sm font-semibold text-white">Keyboard Shortcuts</h2>
+            <Keyboard className="h-4 w-4 text-[#38bdf8]" />
+            <h2 className="font-mono text-xs font-semibold text-white uppercase tracking-wider">
+              Keyboard Shortcuts
+            </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+            className="p-1 text-slate-400 hover:text-white"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="divide-y divide-white/5 p-4 text-xs">
+        <div className="divide-y divide-[#182232] p-3 text-xs font-mono">
           {shortcuts.map(([key, desc]) => (
-            <div key={key} className="flex items-center justify-between py-2">
+            <div key={key} className="flex items-center justify-between py-1.5 text-[11px]">
               <span className="text-slate-300">{desc}</span>
-              <kbd className="rounded border border-white/15 bg-[#05070B] px-2 py-0.5 font-mono-jetbrains text-[11px] text-[#00E5FF]">
+              <kbd className="border border-[#182232] bg-[#06090f] px-1.5 py-0.5 text-[10px] text-[#38bdf8]">
                 {key}
               </kbd>
             </div>
@@ -246,16 +248,16 @@ export const AboutArchitectureModal: React.FC<{
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-      <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-white/15 bg-[#0B0F17] p-5 text-xs text-slate-300 shadow-2xl">
-        <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto border border-[#182232] bg-[#090d14] p-4 text-xs text-slate-300 shadow-2xl font-mono">
+        <div className="mb-3 flex items-center justify-between border-b border-[#182232] pb-2">
           <div className="flex items-center gap-2">
             {tab === 'security' ? (
-              <Lock className="h-4 w-4 text-emerald-400" />
+              <Lock className="h-4 w-4 text-[#34d399]" />
             ) : (
-              <Cpu className="h-4 w-4 text-[#00E5FF]" />
+              <Cpu className="h-4 w-4 text-[#38bdf8]" />
             )}
-            <h2 className="font-ui text-sm font-semibold text-white">
+            <h2 className="text-xs font-semibold text-white uppercase tracking-wider">
               {tab === 'security'
                 ? '100% Local-First Privacy & Sandbox Model'
                 : tab === 'engines'
@@ -266,18 +268,18 @@ export const AboutArchitectureModal: React.FC<{
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+            className="p-1 text-slate-400 hover:text-white"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="space-y-4 leading-relaxed">
-          <div className="rounded border border-[#38bdf8]/30 bg-[#38bdf8]/5 p-3.5">
+        <div className="space-y-3 leading-relaxed text-[11px]">
+          <div className="border border-[#182232] bg-[#06090f] p-3">
             <h3 className="mb-1 font-semibold text-[#38bdf8]">
               Engine A: Rizin v0.9.1 WASM + jsdec v0.9.0
             </h3>
-            <p className="text-zinc-300">
+            <p className="text-slate-400 leading-normal">
               Compiled from native C (`librz`) to WebAssembly via Emscripten (`rzwasi`), paired with
               the official `jsdec` AST control-flow structuring engine running inside an isolated Web
               Worker. Performs full binary header parsing (ELF, PE/COFF, Mach-O, WASM), recursive
@@ -286,11 +288,11 @@ export const AboutArchitectureModal: React.FC<{
             </p>
           </div>
 
-          <div className="rounded border border-[#818cf8]/30 bg-[#818cf8]/5 p-3.5">
-            <h3 className="mb-1 font-semibold text-[#a5b4fc]">
+          <div className="border border-[#182232] bg-[#06090f] p-3">
+            <h3 className="mb-1 font-semibold text-[#c084fc]">
               Engine B: Ghidra C++ Sleigh Decompiler WASM (v11.2 / 0.0.4)
             </h3>
-            <p className="text-zinc-300">
+            <p className="text-slate-400 leading-normal">
               Compiled directly from the NSA Ghidra C++ decompiler core (`libdecomp` + `WasmSleigh`)
               into WebAssembly. Ingests compiled `.sla`, `.pspec`, and `.cspec` processor specifications
               and virtual memory bytechunks in a dedicated Web Worker to perform full P-Code lifting,
@@ -298,11 +300,11 @@ export const AboutArchitectureModal: React.FC<{
             </p>
           </div>
 
-          <div className="rounded border border-emerald-500/30 bg-emerald-500/5 p-3.5">
-            <h3 className="mb-1 flex items-center gap-1.5 font-semibold text-emerald-400">
+          <div className="border border-[#182232] bg-[#06090f] p-3">
+            <h3 className="mb-1 flex items-center gap-1.5 font-semibold text-[#34d399]">
               <ShieldCheck className="h-4 w-4" /> Zero-Telemetry Client-Side Execution Guarantee
             </h3>
-            <p className="text-zinc-300">
+            <p className="text-slate-400 leading-normal">
               Every byte of your binary stays strictly inside your browser&apos;s sandboxed Web Worker
               heap and IndexedDB storage. No binary uploads, external API calls, or remote telemetry
               ever occur. Once loaded, the Progressive Web App (PWA) service worker caches all WASM
