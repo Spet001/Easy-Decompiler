@@ -3,12 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spet's Easy Online Decompiler</title>
-    <meta name="description" content="Local-first WebAssembly binary analyzer and dual C-like decompiler workbench powered by Rizin + jsdec and Ghidra C++ Decompiler in Web Workers." />
+    <title>Spet's Easy Online Decompiler — WebAssembly Binary Analyzer & C Decompiler</title>
+    <meta name="description" content="Local-first WebAssembly binary analyzer and dual C-like decompiler workbench powered by Rizin + jsdec and Ghidra C++ Decompiler running 100% in your browser with zero server uploads." />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://spet01.dev/tools/easy-decompiler/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://spet01.dev/tools/easy-decompiler/" />
     <meta property="og:title" content="Spet's Easy Online Decompiler" />
     <meta property="og:description" content="Local-first WebAssembly binary analyzer and dual C-like decompiler workbench powered by Rizin + jsdec and Ghidra C++ Decompiler in Web Workers." />
-    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://spet01.dev/assets/tool_easy_decompiler.png" />
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://spet01.dev/tools/easy-decompiler/" />
+    <meta name="twitter:title" content="Spet's Easy Online Decompiler" />
+    <meta name="twitter:description" content="Local-first WebAssembly binary analyzer and dual C-like decompiler workbench powered by Rizin + jsdec and Ghidra C++ Decompiler in Web Workers." />
+    <meta name="twitter:image" content="https://spet01.dev/assets/tool_easy_decompiler.png" />
+
     <meta name="theme-color" content="#000000" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -19,9 +30,51 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Spet's Easy Online Decompiler",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern web browsers (WebAssembly)",
+      "url": "https://spet01.dev/tools/easy-decompiler/",
+      "description": "Local-first WebAssembly binary analyzer and dual C-like decompiler workbench powered by Rizin + jsdec and Ghidra C++ Decompiler in Web Workers with zero server uploads.",
+      "author": {
+        "@type": "Person",
+        "name": "Eduardo Gelain",
+        "url": "https://spet01.dev"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
   </head>
   <body class="bg-[#06090f] text-[#cbd5e1] antialiased selection:bg-[#38bdf8]/20 selection:text-[#38bdf8]">
-    <div id="root"></div>
+    <div id="root">
+      <header style="padding: 1.5rem; border-bottom: 1px solid #182232; background: #0c121d;">
+        <h1 style="font-size: 1.25rem; font-weight: 700; color: #38bdf8; margin: 0 0 0.5rem 0; font-family: monospace;">Spet's Easy Online Decompiler</h1>
+        <p style="font-size: 0.875rem; color: #94a3b8; margin: 0; line-height: 1.5;">In-browser WebAssembly binary analyzer, disassembler, and dual C-like decompiler workbench running 100% locally.</p>
+      </header>
+      <main style="padding: 1.5rem; max-width: 900px; margin: 0 auto; font-family: monospace; line-height: 1.6; color: #cbd5e1;">
+        <section style="margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1rem; color: #f8fafc; margin-bottom: 0.5rem;">Architecture & Engine</h2>
+          <p style="font-size: 0.875rem; color: #94a3b8;">Analyze PE, ELF, Mach-O, and raw machine code directly in your browser. Powered by Rizin + jsdec and Ghidra Sleigh C++ decompiler compiled to WebAssembly running inside parallel Web Workers.</p>
+        </section>
+        <section style="margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1rem; color: #f8fafc; margin-bottom: 0.5rem;">Security & Features</h2>
+          <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: #94a3b8; list-style: square;">
+            <li>Zero Server Uploads: Binaries remain completely confidential and local to your workstation.</li>
+            <li>Function Call Graphs, Disassembly, C Pseudo-code view, Symbol Table, and Section Explorer.</li>
+          </ul>
+        </section>
+        <p style="font-size: 0.75rem; color: #64748b;">Loading interactive decompiler workstation...</p>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
