@@ -1,5 +1,7 @@
 # Easy Decompiler
 
+> **Live Web Application:** Available directly in the browser at [spet01.dev/tools/easy-decompiler](https://spet01.dev/tools/easy-decompiler/) (part of the [spet01.dev/tools](https://spet01.dev/tools/) suite). 100% client-side WebAssembly execution, zero server dependencies.
+
 Binary static analysis and dual-engine C-like decompiler runtime executed in browser Web Worker threads via WebAssembly. Provides disassembly, control flow graph (CFG) generation, function boundary reconstruction, string cross-referencing, and C-like pseudocode generation for x86, x86-64, ARM, AArch64, MIPS, RISC-V, PowerPC, and WebAssembly targets.
 
 ## System Architecture
@@ -219,25 +221,9 @@ To serve the production build locally:
 npm run preview
 ```
 
-## CI/CD Deployment Pipeline
+## Online Access
 
-The repository includes an automated GitHub Actions deployment workflow at `.github/workflows/deploy-to-portfolio.yml`.
+This workbench runs entirely client-side inside the browser using WebAssembly and isolated Web Workers.
 
-On every push to `main` (or manual trigger via `workflow_dispatch`):
-1. Installs pinned dependencies using `npm ci`.
-2. Executes the Vitest test suite via `npm test`.
-3. Compiles TypeScript and bundles production assets via `npm run build`.
-4. Checks out the parent portfolio repository (`Spet001/Spet001.github.io`).
-5. Completely wipes `tools/easy-decompiler/` in the target repo to prevent orphaned or stale hashed files.
-6. Copies `dist/` production artifacts into `tools/easy-decompiler/`.
-7. Commits changes and pushes to `main` on `Spet001/Spet001.github.io`, rebasing automatically if concurrent changes occur.
-
-### Authentication Setup
-
-To authorize cross-repository deployments to `Spet001/Spet001.github.io`:
-1. Generate a GitHub Personal Access Token (classic `repo` scope or fine-grained `Contents: Read and write` on `Spet001/Spet001.github.io`).
-2. Add the token to this repository under `Settings > Secrets and variables > Actions` as `PORTFOLIO_DEPLOY_TOKEN` (or `GH_PAT`).
-
-## License
-
-MIT License. See `LICENSE` for details.
+- **Direct Web App:** [https://spet01.dev/tools/easy-decompiler/](https://spet01.dev/tools/easy-decompiler/)
+- **Tools Suite:** [https://spet01.dev/tools/](https://spet01.dev/tools/)
