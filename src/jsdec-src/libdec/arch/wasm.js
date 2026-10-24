@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 import Extra from '../core/extra.js';
@@ -123,7 +120,7 @@ var _type = function(o, unsigned) {
 var _remove_const = function(instr, instructions, stackval) {
     if (stackval && instructions.indexOf(stackval.instr) == (instructions.indexOf(instr) - 1) && stackval.instr.parsed.mnem == 'const') {
         stackval.instr.valid = false;
-        // <type>.const <N>
+
         return stackval.instr.parsed.opd[0];
     }
     return stackval;
@@ -137,7 +134,7 @@ var _math = function(instr, context, instructions, type, op) {
     source_b.type = type;
     var pos = _is_next_a_set(instr, instructions);
     var destination = StackVar(type, instr);
-    context.stack.push(destination); // push must happen.
+    context.stack.push(destination);
     if (pos < 0) {
         return op(destination.toString(), source_a.toString(), source_b.toString());
     }

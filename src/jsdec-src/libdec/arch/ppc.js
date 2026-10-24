@@ -1,8 +1,3 @@
-// SPDX-FileCopyrightText: 2017-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
-/* https://www.ibm.com/developerworks/systems/library/es-archguide-v2.html */
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 import Long from '../long.js';
@@ -322,7 +317,7 @@ var get_spr = function(n) {
 	if (name == null) {
 		return '0x' + n.toString(16);
 	}
-	return name; //+ " /* " + sprs[e].id + " */";
+	return name;
 };
 
 var get_bits = function(spr) {
@@ -336,7 +331,7 @@ var get_bits = function(spr) {
 var op_bits4 = function(e, op, bits, swap) {
 	var a = swap ? e.opd[2] : e.opd[1];
 	var b = swap ? e.opd[1] : e.opd[2];
-	//value, bits, is_signed, is_pointer, is_memory
+
 	if (swap) {
 		b = Variable.local(b, bits);
 	} else {
@@ -391,20 +386,15 @@ var mask64 = function(mb, me) {
 	return (mb <= me) ? maskmb.and(maskme) : maskmb.or(maskme);
 };
 
-/*
-	var mask64inv = function(mb, me) {
-		return mask64(mb, me).not();
-	};
-*/
 var load_bits = function(instr, bits, unsigned) {
 	instr.setBadJump();
 	var e = instr.parsed;
 	var arg = e.opd[1].replace(/\)/, '').split('(');
 	if (arg[1] == '0') {
-		//pointer, register, bits, is_signed
+
 		return Base.read_memory(arg[0], e.opd[0], bits, !unsigned);
 	} else if (arg[0] == '0') {
-		//pointer, register, bits, is_signed
+
 		return Base.read_memory(arg[1], e.opd[0], bits, !unsigned);
 	}
 	arg[0] = (parseInt(arg[0]) >> 0) / (bits / 8);
@@ -413,7 +403,7 @@ var load_bits = function(instr, bits, unsigned) {
 	} else {
 		arg[0] = " + 0x" + arg[0].toString(16);
 	}
-	//pointer, register, bits, is_signed
+
 	return Base.read_memory(arg[1] + arg[0], e.opd[0], bits, !unsigned);
 };
 
@@ -422,10 +412,10 @@ var store_bits = function(instr, bits, unsigned) {
 	var e = instr.parsed;
 	var arg = e.opd[1].replace(/\)/, '').split('(');
 	if (arg[1] == '0') {
-		//pointer, register, bits, is_signed
+
 		return Base.write_memory(arg[0], e.opd[0], bits, !unsigned);
 	} else if (arg[0] == '0') {
-		//pointer, register, bits, is_signed
+
 		return Base.write_memory(arg[1], e.opd[0], bits, !unsigned);
 	}
 	arg[0] = (parseInt(arg[0]) >> 0) / (bits / 8);
@@ -434,7 +424,7 @@ var store_bits = function(instr, bits, unsigned) {
 	} else {
 		arg[0] = " + 0x" + arg[0].toString(16);
 	}
-	//pointer, register, bits, is_signed
+
 	return Base.write_memory(arg[1] + arg[0], e.opd[0], bits, !unsigned);
 };
 
@@ -543,7 +533,7 @@ var _rlwimi = function(dst, src, sh, mb, me, context) {
 	var m = mask32(mb, me);
 	var minv = mask32inv(mb, me);
 	var ops = [];
-	// (dst & ~mask) | (rotl32(src, sh) & mask)
+
 	if (m == 0) {
 		ops.push(Base.and(dst, dst, minv.toString(16)));
 	} else if (minv == 0) {
@@ -730,10 +720,10 @@ var _load_address_32_64 = function(start, instructions) {
 	var instr = instructions[start];
 	var op = instr.parsed.mnem;
 	if (op == 'lis') {
-		/* PPC */
+
 		return lis64_ppc(instr, start, instructions);
 	} else if (op == 'e_lis') {
-		/* PPC VLE */
+
 		return lis64_vle(instr, start, instructions);
 	}
 	return start;
@@ -852,11 +842,7 @@ export default {
 				instr: instr,
 				register: instr.parsed.opd[0]
 			};
-			/*
-			if (instr.parsed.opd[0] == 'r0') {
-				return Base.nop();
-			}
-			*/
+
 			return Base.assign('lr', instr.parsed.opd[0]);
 		},
 		blr: _ppc_return,
@@ -993,11 +979,7 @@ export default {
 			return Base.call('_mtcrf', [instr.parsed.opd[0], instr.parsed.opd[1]]);
 		},
 		mflr: function(instr) {
-			/*
-			if (instr.parsed.opd[0] == 'r0') {
-				return Base.nop();
-			}
-			*/
+
 			return Base.assign(instr.parsed.opd[0], 'lr');
 		},
 		mtocrf: function(instr) {
@@ -1225,14 +1207,7 @@ export default {
 			var me = 31 - parseInt(instr.parsed.opd[2]);
 			return _rlwimi(dst, src, sh, mb, me, context);
 		},
-		/*
-		to be redone. this is wrong.
-		clrlwi %r0, %r0, 31       # %r0 = %r0 & 1
-		rldicr %r10, %r10, 24,39  # %r10 = ((%r10 << 24) | (%r10 >> 40)) & 0xFFFFFFFFFF000000
-		rldicl %r4, %r4, 0,48     # %r4 = %r4 & 0xFFFF
-		rldicl %r0, %r0, 0,59     # %r0 = %r0 & 0x1F
-		rldicl %r9, %r9, 61,3     # %r9 = (%r9 >> 3) & 0x1FFFFFFFFFFFFFFF
-		*/
+
 		rldic: function(instr) {
 			var ra = instr.parsed.opd[0];
 			var rs = instr.parsed.opd[1];
@@ -1527,39 +1502,7 @@ export default {
 		"e_subfic": function(instr, context, instructions) {
 			return op_bits4(instr.parsed, Base.subtract, 32);
 		},
-		/*
-		"e_add2is": function(instr, context, instructions) {},
-		"e_and2is.": function(instr, context, instructions) {},
-		"e_bns": function(instr, context, instructions) {},
-		"e_bso": function(instr, context, instructions) {},
-		"e_bc": function(instr, context, instructions) {},
-		"e_bnsl": function(instr, context, instructions) {},
-		"e_bsol": function(instr, context, instructions) {},
-		"e_bcl": function(instr, context, instructions) {},
-		"e_bnsctr": function(instr, context, instructions) {},
-		"e_bsoctr": function(instr, context, instructions) {},
-		"e_bcctr": function(instr, context, instructions) {},
-		"e_bnsctrl": function(instr, context, instructions) {},
-		"e_bsoctrl": function(instr, context, instructions) {},
-		"e_bcctrl": function(instr, context, instructions) {},
 
-		"e_crand": function(instr, context, instructions) {},
-		"e_crandc": function(instr, context, instructions) {},
-		"e_creqv": function(instr, context, instructions) {},
-		"e_crnand": function(instr, context, instructions) {},
-		"e_crnor": function(instr, context, instructions) {},
-		"e_cror": function(instr, context, instructions) {},
-		"e_crorc": function(instr, context, instructions) {},
-		"e_crxor": function(instr, context, instructions) {},
-
-		"e_mcrf": function(instr, context, instructions) {},
-		"e_mull2i": function(instr, context, instructions) {},
-		"e_mulli": function(instr, context, instructions) {},
-		"e_or2is": function(instr, context, instructions) {},
-
-		"e_rlwimi": function(instr, context, instructions) {},
-		"e_rlwinm": function(instr, context, instructions) {},
-		*/
 		"e_xori": function(instr, context, instructions) {
 			return op_bits3(instr.parsed, Base.xor);
 		},
@@ -1594,9 +1537,7 @@ export default {
 		"se_bctrl": function(instr, context, instructions) {
 			return Base.call(Variable.functionPointer('ctr'), []);
 		},
-		/*
-		"se_bctr": function(instr, context, instructions) {},
-		*/
+
 		"se_rfi": function(instr, context, instructions) {
 			return Base.call('_rfi');
 		},
@@ -1734,10 +1675,7 @@ export default {
 		"se_bmaski": function(instr, context, instructions) {
 			return Base.bit_mask(instr.parsed.opd[0], instr.parsed.opd[0], instr.parsed.opd[1]);
 		},
-		/*
-					"se_bclri": function(instr, context, instructions) {},
-					"se_bgeni": function(instr, context, instructions) {},
-		*/
+
 		"se_bseti": function(instr, context, instructions) {
 			var bit = '(1 << ' + parseInt(instr.parsed.opd[1]) + ')';
 			return Base.or(instr.parsed.opd[0], instr.parsed.opd[0], bit);
@@ -1843,7 +1781,7 @@ export default {
 		};
 	},
 	postanalisys: function(instructions, context) {
-		/* simplifies any load address 32/64 bit */
+
 		for (var i = 0; i < instructions.length; i++) {
 			i = _load_address_32_64(i, instructions);
 		}

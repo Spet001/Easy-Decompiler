@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from './base.js';
 import Utils from './utils.js';
 import Scope from './scope.js';
@@ -72,10 +69,10 @@ var _set_outbounds_jump = function(instruction, index, context) {
 		return false;
 	}
 	if (!instruction.code) {
-		//instruction.code = Base.goto('0x' + instruction.jump.toString());
+
 		var call = Variable.functionPointer('0x' + instruction.jump.toString(16), 0, []);
 		instruction.code = Base.call(call, []);
-		// if we have a jump as the last instruction, then we will have a return call for sure.
+
 	}
 
 	if (context.instructions.indexOf(instruction) == (context.instructions.length - 1)) {
@@ -104,7 +101,7 @@ var _set_outbounds_jump = function(instruction, index, context) {
 };
 
 var _set_loops = function(instruction, index, context) {
-	// loops jumps only backwards or to the same location.
+
 	var single_instr = null;
 	if (instruction.jump.gt(instruction.location)) {
 		return false;
@@ -114,7 +111,6 @@ var _set_loops = function(instruction, index, context) {
 		return false;
 	}
 
-	// let's check if is a oneline loop or panic loop
 	if (instruction.jump.eq(instruction.location)) {
 		single_instr = block.split(index);
 		if (single_instr) {
@@ -140,7 +136,7 @@ var _set_loops = function(instruction, index, context) {
 		_set_goto(instruction, label);
 		if (instruction.cond) {
 			single_instr = block.split(block.instructions.indexOf(instruction));
-			// here the jump is taken only if the condition is true.
+
 			if (single_instr) {
 				single_instr.addExtraHead(new Scope.if(instruction.location, _condition(instruction, false)));
 				single_instr.addExtraTail(new Scope.brace(instruction.location));
@@ -156,14 +152,12 @@ var _set_loops = function(instruction, index, context) {
 
 	var next = loop_block.split(loop_block.instructions.indexOf(instruction) + 1);
 
-	// let's check it there is a jump inside the loop
-	// if it is, then it's a while (cond) {}
 	if (previous && previous.jump && previous.jump.gte(instruction.jump) && previous.jump.lte(instruction.location)) {
 		previous.setBadJump();
 		loop_block.addExtraHead(new Scope.while(instruction.jump, _condition(instruction)));
 		loop_block.addExtraTail(new Scope.brace(instruction.location));
 	} else {
-		// ok it's a do {} while (cond);
+
 		loop_block.addExtraHead(new Scope.do(instruction.jump));
 		loop_block.addExtraTail(new Scope.whileEnd(instruction.location, _condition(instruction)));
 	}
@@ -175,12 +169,11 @@ var _set_loops = function(instruction, index, context) {
 
 var _set_if_else = function(instruction, index, context) {
 	var label = null;
-	// if/else jumps only forward and inside the block.
+
 	if (instruction.jump.lte(instruction.location)) {
 		return false;
 	}
 
-	// if jumps to the next instruction, just ignore it..
 	if (!instruction.cond && context.instructions[index + 1] && context.instructions[index + 1].location.eq(instruction.jump)) {
 		instruction.setBadJump();
 		return false;
@@ -211,7 +204,6 @@ var _set_if_else = function(instruction, index, context) {
 
 	var outside = Utils.search(instruction.jump, block.instructions, _compare_locations);
 
-	// not found. let's use goto.
 	if (!outside) {
 		label = context.findLabel(instruction.jump);
 		if (!label) {
@@ -224,7 +216,7 @@ var _set_if_else = function(instruction, index, context) {
 			if (!single_instr) {
 				return true;
 			}
-			// here the jump is taken only if the condition is true.
+
 			single_instr.addExtraHead(new Scope.if(instruction.location, _condition(instruction, false)));
 			single_instr.addExtraTail(new Scope.brace(instruction.location));
 			context.addBlock(single_instr);
@@ -233,24 +225,20 @@ var _set_if_else = function(instruction, index, context) {
 		return true;
 	}
 
-	// let's create the if block.
 	var if_block = block.split(block.instructions.indexOf(instruction));
 	if (!if_block) {
 		return false;
 	}
 	if_block.addExtraHead(new Scope.if(instruction.location, _condition(instruction, true)));
 
-
-	// let's get the last element inside the if (jump instr -1).
 	var outside_index = if_block.instructions.indexOf(outside);
 	var last_if_instruction = if_block.instructions[outside_index - 1];
 	if (!last_if_instruction) {
 		return true;
 	}
 
-	// let's check if the last instruction is a jump forward (outside), that can lead to an else
 	if (last_if_instruction.jump && !last_if_instruction.cond && last_if_instruction.jump.gt(last_if_instruction.location)) {
-		// ok we have an else. let's search for the last instruction.
+
 		var first_else_instruction = outside;
 		var instr_after_else = Utils.search(last_if_instruction.jump, context.instructions, _compare_locations);
 		var last_else_instruction = context.instructions[context.instructions.indexOf(instr_after_else) - 1];

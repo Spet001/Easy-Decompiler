@@ -1,22 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
-/**
- * On rizin this can be done via afcfj <function name>
- * [
- *    {
- *      "name": "localtime",
- *      "return": "struct tm *",
- *      "count": 1,
- *      "args": [
- *        {
- *          "name": "timer",
- *          "type": "const time_t *"
- *        }
- *      ]
- *    }
- *  ]
- */
 export default {
     'libc_start_main': {
         macro: [],
@@ -234,7 +215,7 @@ export default {
         macro: ['#include <signal.h>'],
         required: 1,
     },
-    /* iOS */
+
     'UIApplicationMain': {
         macro: [],
         required: 4,

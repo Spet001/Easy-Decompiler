@@ -71,7 +71,7 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#06090f]">
-      {/* Toolbar */}
+
       <div className="z-10 flex items-center justify-between border-b border-[#182232] bg-[#0c121d] px-2.5 py-1 text-xs shrink-0 select-none">
         <div className="flex items-center gap-3">
           <span className="font-mono font-semibold text-[#38bdf8]">
@@ -133,7 +133,6 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
         </div>
       </div>
 
-      {/* Interactive SVG Canvas */}
       <div
         className="relative flex-1 cursor-grab overflow-auto active:cursor-grabbing"
         onMouseDown={(e) => {
@@ -193,7 +192,6 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
             </marker>
           </defs>
 
-          {/* Edges */}
           {layout.edges.map((e, i) => {
             const x1 = e.fromNode.x + e.fromNode.w / 2;
             const y1 = e.fromNode.y + e.fromNode.h;
@@ -221,7 +219,6 @@ export const CfgCanvasView: React.FC<CfgCanvasViewProps> = ({ cfg, onSelectAddre
             );
           })}
 
-          {/* Blocks */}
           {layout.nodes.map((node) => {
             const isSelected = selectedBlock === node.address;
             const borderColor = node.isEntry

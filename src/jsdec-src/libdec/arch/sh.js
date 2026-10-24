@@ -1,10 +1,3 @@
-// SPDX-FileCopyrightText: 2019-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
-// https://www.rockbox.org/wiki/pub/Main/DataSheets/sh1_2p.pdf
-// http://www.shared-ptr.com/sh_insns.html
-
-
 import Instruction from '../core/instruction.js';
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
@@ -73,7 +66,7 @@ function _handle_pointer(instr, idx, ops) {
 function _arg(instr, idx) {
 	var e = instr.parsed;
 	if (e.opd[idx].pointer) {
-		// a great way to fix PC + N
+
 		if (e.opd[idx].token.startsWith('pc +')) {
 			var n = parseInt(e.opd[idx].token.substr('pc +'.length));
 			var p = instr.location.add(n);
@@ -121,13 +114,7 @@ export default {
 			var src = _arg(instr, 1);
 			return Base.swap(dst, src, 32);
 		},
-		/*
-		xtrct: function(instr, context, instructions) {
-			var dst = _arg(instr, 0);
-			var src = _arg(instr, 1);
-			return Base.?????(dst, src);
-		},
-		 */
+
 		add: function(instr) {
 			var dst = _arg(instr, 0);
 			var src = _arg(instr, 1);
@@ -449,43 +436,6 @@ export default {
 		assembly = assembly.replace(/,/g, ' ');
 		assembly = assembly.replace(/\s+/g, ' ');
 
-		/*
-		   Regex explaination:
-			^
-			  (\w+)
-			  \.?
-			  ([wlb])? // word/long/byte
-			  ([sn])?  // delayed branch
-			  \/?
-			  (hi|eq|hs|pl|pz|str)? // compare flags
-			   ?       // space might not exists (aka no 1st and 2nd param)
-			  (
-				(
-					(@)? // Indirect or Direct access
-					(
-						(\(\w+\s\w+\)) A + B value
-						  |
-							(-)?  Pre-decrement
-							([\w._]+) register
-							(\+)? Post-increment
-					)
-				)
-			  )?
-			   ?       // space might not exists (aka no 2nd param)
-			  (
-				(
-					(@)? // Indirect or Direct access
-					(
-						(\(\w+\s\w+\)) A + B value
-						  |
-							(-)?  Pre-decrement
-							([\w._]+) register
-							(\+)? Post-increment
-					)
-				)
-			  )?
-			$
-		*/
 		var tokens = assembly.match(/^(\w+)\.?([wlb])?([sn])?\/?(hi|eq|hs|pl|pz|str)? ?(((@)?((\(\w+\s\w+\))|(-)?([\w._]+)(\+)?)))? ?(((@)?((\(\w+\s\w+\))|(-)?([\w._]+)(\+)?)))?$/);
 		var mnem = tokens[1];
 		var size = _size_map[tokens[2]];
@@ -527,7 +477,7 @@ export default {
 		};
 	},
 	preanalisys: function(instructions, context) {
-		/* delayed branch fix */
+
 		for (var i = 0; i < (instructions.length - 1); i++) {
 			var op = instructions[i].parsed.mnem;
 			if (_branch_list.indexOf(op) >= 0 && instructions[i + 1].parsed.mnem != 'nop') {

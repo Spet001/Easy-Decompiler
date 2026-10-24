@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2020-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import rzutil from './rzutil.js';
 import Strings from './core/strings.js';
 import Functions from './core/functions.js';
@@ -88,13 +85,13 @@ export default {
             a.push(new Annotation(current, ll, line.str, null, "syntax_highlight", "comment"));
             return a;
         }
-        /* strings */
+
         for (i = context.strings.length - 1; i >= 0; i--) {
             it = context.strings[i];
             var str = '"' + it.value + '"';
             pos = line.str.indexOf(str);
             if (pos > 0) {
-                // include the ""
+
                 a.push(new Annotation(current + pos, str.length, str, it.location, "global_variable", null));
                 a.push(new Annotation(current + pos, str.length, str, null, "syntax_highlight", "global_variable"));
                 string_beg = pos;
@@ -102,7 +99,7 @@ export default {
                 break;
             }
         }
-        /* strings with regex */
+
         if (string_end < 0) {
             tmp = line.str.match(_re_string) || [];
             for (i = tmp.length - 1, old = 0; i >= 0; i--) {
@@ -113,7 +110,7 @@ export default {
                 break;
             }
         }
-        /* function names */
+
         if (context.arch == "dalvik") {
             pos = line.str.search(_re_objcall);
             if (pos >= 0 && !(pos >= string_beg && pos <= string_end)) {
@@ -133,7 +130,7 @@ export default {
                 }
             }
         }
-        /* variables */
+
         for (i = context.variables.length - 1, old = 0; i >= 0; i--) {
             it = context.variables[i];
             if (!it) {
@@ -150,13 +147,13 @@ export default {
                 a.push(new Annotation(current + pos, it.name.length, it.name, null, "syntax_highlight", type));
             }
         }
-        /* keywords */
+
         _match_annotation(_re_keywords, line.str, function(pos, match) {
             if (pos >= 0 && !(pos >= string_beg && pos <= string_end)) {
                 a.push(new Annotation(current + pos, match.length, match, null, "syntax_highlight", "keyword"));
             }
         });
-        /* numbers */
+
         _match_annotation(_re_numbers, line.str, function(pos, match) {
             if (match.length > 1 && match.charAt(0) == '0' && match.charAt(1) != 'x') {
                 return;
@@ -172,7 +169,7 @@ export default {
                 a.push(new Annotation(current + pos, match.length, match, null, "syntax_highlight", "constant_variable"));
             }
         });
-        /* types */
+
         _match_annotation(_re_types, line.str, function(pos, match) {
             if (pos >= 0 && !(pos >= string_beg && pos <= string_end)) {
                 a.push(new Annotation(current + pos, match.length, match, null, "syntax_highlight", "datatype"));

@@ -117,7 +117,7 @@ async function fetchArtifact(
         return { text, buffer };
       }
     } catch {
-      // continue to next candidate
+
     }
   }
   throw new Error(`Failed to fetch ${filename} from any candidate path`);
@@ -171,7 +171,7 @@ async function ensureRizinLoaded(): Promise<void> {
   try {
     rizinModule.FS.mkdir('/work');
   } catch {
-    // Directory already exists
+
   }
 
   postProgress('Rizin v0.9.1 WASM core initialized in Web Worker.', 'success');
@@ -295,7 +295,7 @@ async function handleOpenBinary(data: Uint8Array, filename: string): Promise<Bin
     try {
       closeSessionFn(sessionId);
     } catch {
-      // Ignore close error
+
     }
     sessionId = 0;
   }
@@ -308,7 +308,7 @@ async function handleOpenBinary(data: Uint8Array, filename: string): Promise<Bin
   try {
     rizinModule.FS.unlink(safePath);
   } catch {
-    // Ignore if file doesn't exist
+
   }
   rizinModule.FS.writeFile(safePath, currentBinaryData);
 
@@ -317,7 +317,6 @@ async function handleOpenBinary(data: Uint8Array, filename: string): Promise<Bin
     postProgress(`Rizin open_file returned 0 for ${safePath}; proceeding with raw binary fallback.`, 'warn');
   }
 
-  // Configure Rizin defaults for clean disassembly
   runRizinCmd('e scr.color=0');
   runRizinCmd('e asm.lines=false');
   runRizinCmd('e io.cache=true');
@@ -348,14 +347,13 @@ async function handleAnalyze(minStringLength = 4): Promise<AnalysisResult> {
   postProgress('Running Rizin full binary analysis (aaa)...', 'info');
   runRizinCmd('aaa');
 
-  // 1. Sections
   const rawSections = parseJsonSafe<any[]>(runRizinCmd('iSj'), []);
   const sections: SectionInfo[] = rawSections
     .filter((s) => s && s.name && Number(s.size) > 0)
     .map((s) => {
       const paddr = Number(s.paddr ?? 0);
       const rawVaddr = BigInt(s.vaddr ?? 0);
-      // Guard against UINT64_MAX (-1) unmapped sections like .symtab
+
       const vaddr = rawVaddr > 0xffffffffffff0000n ? paddr : Number(rawVaddr);
       const sz = Number(s.size ?? 0);
       const slice =
@@ -379,7 +377,6 @@ async function handleAnalyze(minStringLength = 4): Promise<AnalysisResult> {
       };
     });
 
-  // 2. Imports, Exports, Symbols, Relocations
   const rawImports = parseJsonSafe<any[]>(runRizinCmd('iij'), []);
   const imports: ImportInfo[] = rawImports.map((imp) => {
     const vaddr = Number(imp.plt ?? imp.vaddr ?? 0);
@@ -442,7 +439,6 @@ async function handleAnalyze(minStringLength = 4): Promise<AnalysisResult> {
     };
   });
 
-  // 3. Strings (combine Rizin izzj + full binary scan)
   const rawStrings = parseJsonSafe<any[]>(runRizinCmd('izzj'), []);
   const strings: StringInfo[] = extractBinaryStrings(
     currentBinaryData,
@@ -451,7 +447,6 @@ async function handleAnalyze(minStringLength = 4): Promise<AnalysisResult> {
     rawStrings
   );
 
-  // 4. Functions
   const rawFunctions = parseJsonSafe<any[]>(runRizinCmd('aflj'), []);
   const entryPointAddr = parseInt(currentMetadata.entryPoint, 16) || 0;
   const exportAddrs = new Set(exportsList.map((e) => e.virtualAddress));
@@ -579,7 +574,6 @@ async function handleAnalyze(minStringLength = 4): Promise<AnalysisResult> {
     };
   });
 
-  // Update section counts
   for (const sec of sections) {
     sec.functionsCount = functions.filter(
       (fn) =>
@@ -589,7 +583,6 @@ async function handleAnalyze(minStringLength = 4): Promise<AnalysisResult> {
     sec.stringsCount = strings.filter((s) => s.section === sec.name).length;
   }
 
-  // Build Call Graph
   const cgNodes: CallGraphNode[] = functions.map((fn, idx) => ({
     id: fn.address,
     address: fn.address,
@@ -611,7 +604,6 @@ async function handleAnalyze(minStringLength = 4): Promise<AnalysisResult> {
     edges: cgEdges,
   };
 
-  // Update metadata with section entropy checks
   currentMetadata = inspectBinaryHeaders(
     currentBinaryData,
     currentFilename,
@@ -840,7 +832,7 @@ async function handleDecompile(address: string): Promise<DecompilationResult> {
 
   let code = outputLines.join('\n').trim();
   if (!code) {
-    // Provide structured C-like reconstruction from Rizin disassembly if jsdec produced empty output
+
     const lines = getDisassemblyLinesForAddress(address);
     const body = lines
       .map((l) => `    /* ${l.address} */ ${l.disasm};`)

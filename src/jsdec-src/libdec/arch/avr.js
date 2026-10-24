@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 
@@ -104,7 +101,7 @@ var _load16 = function(instr, context) {
 	if (ptr.indexOf('-') >= 0) {
 		ptr = ptr.replace('-', '');
 		v = Variable.uniqueName('local');
-		//pointer, register, bits, is_signed
+
 		m = [
 			Base.read_memory(AVR_MEMORY[ptr].name, instr.parsed.opd[0], 8, false),
 			Base.assign('uint8_t ' + v, AVR_MEMORY[ptr].low),
@@ -117,7 +114,7 @@ var _load16 = function(instr, context) {
 	} else if (ptr.indexOf('+') >= 0) {
 		ptr = ptr.replace('+', '');
 		v = Variable.uniqueName('local');
-		//pointer, register, bits, is_signed
+
 		m = [
 			Base.read_memory(AVR_MEMORY[ptr].name, instr.parsed.opd[0], 8, false),
 			Base.assign('uint8_t ' + v, AVR_MEMORY[ptr].low),
@@ -128,7 +125,7 @@ var _load16 = function(instr, context) {
 		Global().context.addMacro(AVR_MEMORY[ptr].macro);
 		return op;
 	}
-	//pointer, register, bits, is_signed
+
 	op = Base.read_memory(AVR_MEMORY[ptr].name, instr.parsed.opd[0], 8, false);
 	Global().context.addMacro(AVR_MEMORY[ptr].macro);
 	return op;
@@ -142,7 +139,7 @@ var _store16 = function(instr, context) {
 	if (ptr.indexOf('-') >= 0) {
 		ptr = ptr.replace(/-\d?/, '');
 		v = Variable.uniqueName('local');
-		//pointer, register, bits, is_signed
+
 		m = [
 			Base.write_memory(AVR_MEMORY[ptr].name, instr.parsed.opd[1], 8, false),
 			Base.assign('uint8_t ' + v, AVR_MEMORY[ptr].low),
@@ -155,7 +152,7 @@ var _store16 = function(instr, context) {
 	} else if (ptr.indexOf('+') >= 0) {
 		ptr = ptr.replace(/\+\d?/, '');
 		v = Variable.uniqueName('local');
-		//pointer, register, bits, is_signed
+
 		m = [
 			Base.write_memory(AVR_MEMORY[ptr].name, instr.parsed.opd[1], 8, false),
 			Base.assign('uint8_t ' + v, AVR_MEMORY[ptr].low),
@@ -166,7 +163,7 @@ var _store16 = function(instr, context) {
 		Global().context.addMacro(AVR_MEMORY[ptr].macro);
 		return op;
 	}
-	//pointer, register, bits, is_signed
+
 	op = Base.write_memory(AVR_MEMORY[ptr].name, instr.parsed.opd[1], 8, false);
 	Global().context.addMacro(AVR_MEMORY[ptr].macro);
 	return op;
@@ -290,7 +287,7 @@ export default {
 		call: function(instr, context) {
 			instr.setBadJump();
 			_returns_r0(instr, context);
-			//name, args, is_pointer, returns, bits
+
 			if (instr.parsed.opd[0].indexOf('0x') == 0) {
 				return Base.call(Variable.functionPointer(instr.parsed.opd[0], 16), []);
 			}
@@ -351,7 +348,7 @@ export default {
 		icall: function(instr, context) {
 			_returns_r0(instr, context);
 			instr.setBadJump();
-			//name, args, is_pointer, returns, bits
+
 			var op = Base.call(Variable.functionPointer(AVR_MEMORY.z.name), []);
 			Global().context.addMacro(AVR_MEMORY.z.macro);
 			return op;
@@ -385,7 +382,7 @@ export default {
 			_returns_r0(instr, context);
 			var ptr = instr.parsed.opd[1].match(/([xyz]|[+-0-9]+)/g);
 			var offset = ptr[1].replace(/(-)/, ' - ').replace(/(\+)/, ' + ');
-			//pointer, register, bits, is_signed
+
 			var op = Base.read_memory(AVR_MEMORY[ptr[0]].name + offset, instr.parsed.opd[0], 8, false);
 			Global().context.addMacro(AVR_MEMORY[ptr[0]].macro);
 			return op;
@@ -396,7 +393,7 @@ export default {
 		},
 		lds: function(instr, context) {
 			_returns_r0(instr, context);
-			//pointer, register, bits, is_signed
+
 			return Base.read_memory(instr.parsed.opd[1], instr.parsed.opd[0], 8, false);
 		},
 		lpm: _load16,
@@ -479,7 +476,7 @@ export default {
 		pop: function(instr, context) {
 			instr.setBadJump();
 			if (instr.parsed.opd[0] == 'r0') {
-				// if pops an r0, then the return value is void.
+
 				context.returns = null;
 			}
 			return Base.nop();
@@ -494,8 +491,7 @@ export default {
 		},
 		ret: function(instr, context) {
 			_returns_r0(instr, context);
-			// returns r1:r0
-			// but if pop r0 then return void.
+
 			return Base.return(context.returns);
 		},
 		reti: function(instr) {
@@ -596,7 +592,7 @@ export default {
 			_returns_r0(instr, context);
 			var ptr = instr.parsed.opd[0].match(/([xyz]|[+-0-9]+)/g);
 			var offset = ptr[1].replace(/(-)/, ' - ').replace(/(\+)/, ' + ');
-			//pointer, register, bits, is_signed
+
 			var op = Base.write_memory(AVR_MEMORY[ptr[0]].name + offset, instr.parsed.opd[1], 8, false);
 			Global().context.addMacro(AVR_MEMORY[ptr[0]].macro);
 			return op;
@@ -604,7 +600,7 @@ export default {
 		sts: function(instr, context) {
 			instr.setBadJump();
 			_returns_r0(instr, context);
-			//pointer, register, bits, is_signed
+
 			return Base.write_memory(instr.parsed.opd[0], instr.parsed.opd[1], 8, false);
 		},
 		sub: function(instr, context) {

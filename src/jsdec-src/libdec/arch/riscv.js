@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2021-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 import Long from '../long.js';
@@ -12,10 +9,10 @@ function load_bits(instr, bits, unsigned) {
 	if (arg[0].indexOf('-sym.') == 0 && arg[1] == 'gp') {
 		return Base.assign(e.opd[0], arg[0].replace(/^-/, ''));
 	} else if (arg[1] == '0') {
-		//pointer, register, bits, is_signed
+
 		return Base.read_memory(arg[0], e.opd[0], bits, !unsigned);
 	} else if (arg[0] == '0') {
-		//pointer, register, bits, is_signed
+
 		return Base.read_memory(arg[1], e.opd[0], bits, !unsigned);
 	}
 	arg[0] = arg[0].length > 0 ? parseInt(arg[0]) : NaN;
@@ -35,10 +32,10 @@ function store_bits(instr, bits, unsigned) {
 	var e = instr.parsed;
 	var arg = e.opd[1].replace(/\)/, '').split('(');
 	if (arg[1] == '0') {
-		//pointer, register, bits, is_signed
+
 		return Base.write_memory(arg[0], e.opd[0], bits, !unsigned);
 	} else if (arg[0] == '0') {
-		//pointer, register, bits, is_signed
+
 		return Base.write_memory(arg[1], e.opd[0], bits, !unsigned);
 	}
 	arg[0] = arg[0].length > 0 ? parseInt(arg[0]) : NaN;
@@ -542,7 +539,7 @@ export default {
 
 		var mnem = asm.shift();
 		if (mnem.indexOf('amo') == 0) {
-			// atomic ops.
+
 			asm = asm.map(function(x) {
 				return x.replace(/\(|\)/g, '');
 			});
@@ -563,7 +560,7 @@ export default {
 	},
 	preanalisys: function(instructions) {},
 	postanalisys: function(instructions, context) {
-		/* simplifies any load address 32/64 bit */
+
 		for (var i = 0; i < instructions.length; i++) {
 			if (instructions[i].parsed.mnem == 'lui') {
 				i = lui32(instructions[i], i, instructions);

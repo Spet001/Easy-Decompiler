@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @layer base {
-  /* Default: Pitch Black (OLED) */
+  
   :root, [data-theme="oled"] {
     --bg-canvas: #000000;
     --bg-panel: #070707;
@@ -16,7 +16,6 @@
     --text-muted: #64748b;
   }
 
-  /* Slade Industrial (Amber / Carmine Forge) */
   [data-theme="slade"] {
     --bg-canvas: #080706;
     --bg-panel: #0e0c0a;
@@ -31,7 +30,6 @@
     --text-muted: #78716c;
   }
 
-  /* Classic Dark Navy (Cobalt) */
   [data-theme="cobalt"] {
     --bg-canvas: #06090f;
     --bg-panel: #090d14;
@@ -46,7 +44,6 @@
     --text-muted: #64748b;
   }
 
-  /* IDA Classic Dark (Graphite) */
   [data-theme="ida"] {
     --bg-canvas: #141414;
     --bg-panel: #1a1a1a;
@@ -95,7 +92,6 @@
   }
 }
 
-/* Theme Surface Overrides */
 [data-theme] {
   background-color: var(--bg-canvas);
   color: var(--text-main);
@@ -132,7 +128,6 @@
   border-color: var(--border-subtle) !important;
 }
 
-/* Universal Accent Variables Mapping */
 [data-theme] .text-\[\#38bdf8\],
 [data-theme] .text-\[\#00e5ff\] {
   color: var(--accent-primary) !important;
@@ -175,21 +170,18 @@
   background-color: color-mix(in srgb, var(--accent-primary) 8%, transparent) !important;
 }
 
-/* OLED Specific Overrides */
 [data-theme="oled"] .bg-\[\#38bdf8\],
 [data-theme="oled"] .bg-\[\#00e5ff\] {
   background-color: var(--accent-primary) !important;
   color: #000000 !important;
 }
 
-/* Slade Specific Overrides */
 [data-theme="slade"] .bg-\[\#38bdf8\],
 [data-theme="slade"] .bg-\[\#00e5ff\] {
   background-color: var(--accent-primary) !important;
   color: #080706 !important;
 }
 
-/* IDA Specific Overrides */
 [data-theme="ida"] .bg-\[\#38bdf8\],
 [data-theme="ida"] .bg-\[\#00e5ff\] {
   background-color: var(--accent-primary) !important;

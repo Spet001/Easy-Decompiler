@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2017-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import rzpipe from '../rzpipe.js';
 import Utils from './utils.js';
 
@@ -40,9 +37,6 @@ var _flag_filter = function(x) {
     return '_';
 };
 
-/*
- * Expects the Csj json as input.
- */
 export default function(Csj, sort_by_size) {
     this.data = Csj.filter(_sanitize).map(function(x) {
         return {

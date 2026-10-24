@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from './core/base.js';
 import Block from './core/block.js';
 import Scope from './core/scope.js';
@@ -13,12 +10,6 @@ import Instruction from './core/instruction.js';
 import ControlFlow from './core/controlflow.js';
 import XRefs from './core/xrefs.js';
 
-/**
- * Fixes for known routine names that are standard (like main)
- * @param  {String} routine_name Routine name
- * @param  {String} return_type  Return type
- * @return {String}              New return type
- */
 var _hardcoded_fixes = function(routine_name, return_type) {
     if (Extra.replace.call(routine_name) == "main") {
         return 'int32_t';
@@ -26,14 +17,6 @@ var _hardcoded_fixes = function(routine_name, return_type) {
     return return_type || 'void';
 };
 
-/**
- * Is the function that is called after the opcode analisys.
- * Essentially analyze the flows and allows the call of
- * the `postanalisys` function that has to be set in the architecture.
- * @param  {Object} session      - Current session object.
- * @param  {Object} arch         - Current architecture object
- * @param  {Object} arch_context - Current architecture context object.
- */
 var _post_analysis = function(session, arch, arch_context) {
     ControlFlow(session);
     if (arch.postanalisys) {
@@ -55,14 +38,6 @@ var _post_analysis = function(session, arch, arch_context) {
     session.routine = routine;
 };
 
-/**
- * Is the function that is called before the opcode analisys.
- * Calls `preanalisys` function that has to be set in the architecture
- * and copies the instruction into the first block and updates the bounds of this.
- * @param  {Object} session      - Current session object.
- * @param  {Object} arch         - Current architecture object
- * @param  {Object} arch_context - Current architecture context object.
- */
 var _pre_analysis = function(session, arch, arch_context) {
     if (arch.preanalisys) {
         arch.preanalisys(session.instructions, arch_context);
@@ -71,12 +46,6 @@ var _pre_analysis = function(session, arch, arch_context) {
     session.blocks[0].update();
 };
 
-/**
- * Most important of the analisys block: it analize the architecture opcodes. 
- * @param  {Object} session      - Current session object.
- * @param  {Object} arch         - Current architecture object
- * @param  {Object} arch_context - Current architecture context object.
- */
 var _decompile = function(session, arch, arch_context) {
     var instructions = session.blocks[0].instructions;
     for (var i = 0; i < instructions.length; i++) {
@@ -86,15 +55,11 @@ var _decompile = function(session, arch, arch_context) {
             break;
         }
         var fcn = arch.instructions[instr.parsed.mnem];
-        // Global().context.printLine(instr.assembly)
+
         instr.code = fcn ? fcn(instr, arch_context, instructions) : new Base.unknown(instr.assembly);
     }
 };
 
-/**
- * Prints the current session into the screen.
- * @param  {Object} session - Current session object.
- */
 var _print = function(session) {
     var lineoff = session.instructions.length > 0 ? session.instructions[0].location : null;
     if (!session.routine) {
@@ -114,7 +79,7 @@ var _print = function(session) {
         var t = Global().printer.theme;
         var asm_header = Global().evars.honor.offsets ? '' : '; assembly';
         var details = '/* ' + Global().evars.extra.file + ' @ 0x' + Global().evars.extra.offset.toString(16) + ' */';
-        
+
         Global().context.printLine(Global().context.identfy(asm_header.length, t.comment(asm_header)) + t.comment('/* jsdec pseudo code output */'), lineoff);
         Global().context.printLine(Global().context.identfy() + t.comment(details), lineoff);
         if (['java', 'dalvik'].indexOf(Global().evars.arch) < 0) {
@@ -131,11 +96,6 @@ var _print = function(session) {
     }
 };
 
-/**
- * Defines the structure that will be used as session for analisys steps.
- * @param  {Object} data  - Data to be analized.
- * @param  {Object} arch  - Current architecture object
- */
 var _session = function(data, arch) {
     this.blocks = [new Block()];
     var instructions = [];
@@ -148,7 +108,7 @@ var _session = function(data, arch) {
     Global().xrefs = new XRefs(strings, symbols, classes);
     for (var i = 0; i < data.graph[0].blocks.length; i++) {
         var block = data.graph[0].blocks[i];
-        // This is hacky but it is required by wasm..
+
         if (data.arch == 'wasm') {
             var last = block.ops[block.ops.length - 1];
             if (!last.jump) {

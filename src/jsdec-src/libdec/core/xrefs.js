@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2019-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 export default function(strings, symbols, classes) {
 	this.db_strings = strings;
 	this.db_symbols = symbols;

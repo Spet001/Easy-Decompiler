@@ -1,13 +1,6 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import _call_common from '../db/macros.js';
 import Long from '../long.js';
 
-/**
- * Types size
- * @type {Object}
- */
 const _standard_types = {
 	'void': 0,
 	'char': 8,
@@ -49,10 +42,6 @@ var _align_address = function(x) {
 	return '0x' + zeros32.substr(c.length, zeros32.length) + c;
 };
 
-/**
- * Is helpers
- * @type {Object}
- */
 const _is = {
 	string: function(s) {
 		return typeof s == 'string';
@@ -73,10 +62,6 @@ const _is = {
 	},
 };
 
-/**
- * To helpers
- * @type {Object}
- */
 const _to = {
 	type: function(bits, signed) {
 		if (bits == 0 || !bits) {
@@ -107,10 +92,6 @@ const _to = {
 	},
 };
 
-/**
- * Find helpers
- * @type {Object}
- */
 const _find = {
 	arguments_number: function(name) {
 		name = _replace.call(name);
@@ -138,10 +119,6 @@ const _find = {
 	}
 };
 
-/**
- * Replace helpers
- * @type {Object}
- */
 const _replace = {
 	call: function(name) {
 		if (typeof name != 'string' || name.startsWith('0x')) {
@@ -153,10 +130,7 @@ const _replace = {
 			name = name.substring('sym.'.length).replace(/^_+/, '');
 		} else if (name.startsWith('imp.')) {
 			name = name.substring('imp.'.length).replace(/^_+/, '');
-			//} else if (name.startsWith('fcn.')) {
-			//    name = name.substring('fcn.'.length);
-			//} else if (name.startsWith('func.')) {
-			//    name = name.substring('func.'.length);
+
 		}
 		if (name.startsWith('reloc.')) {
 			name = name.substring('reloc.'.length).replace(/^_+/, '');
@@ -179,15 +153,12 @@ const _replace = {
 			name = name.substring('sym.'.length);
 		} else if (name.startsWith('imp.')) {
 			name = name.substring('imp.'.length);
-			//} else if (name.startsWith('fcn.')) {
-			//    name = name.substring('fcn.'.length);
-			//} else if (name.startsWith('func.')) {
-			//    name = name.substring('func.'.length);
+
 		} else if (name.startsWith('reloc.')) {
 			name = name.substring('reloc.'.length);
 		}
 		if (name.startsWith('L') || name.startsWith('[L')) {
-			// java object
+
 			name = name.replace(/\.<init>\(.+$|\(.+$|\._init_.+V$|_L.+$/, '');
 			name = name.substr(name.startsWith('L') ? 1 : 2).replace(/\/|;->/g, '.').replace(/\s.+$|;$/, '');
 			if (name.indexOf('_L') > 0) {
@@ -207,10 +178,6 @@ const _tryas = {
 	}
 };
 
-/**
- * Extra object
- * @return {Function} - Extra object
- */
 export default {
 	tryas: _tryas,
 	is: _is,

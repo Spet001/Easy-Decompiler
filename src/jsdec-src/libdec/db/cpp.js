@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 const _known_cpp_data = {
 	'std::basic_string<char,std::char_traits<char>,std::allocator<char>>,std::allocator<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>': 'std::string',
 	'std::basic_stringstream<char,std::char_traits<char>,std::allocator<char>>::basic_stringstream': 'std::stringstream ',

@@ -1,10 +1,5 @@
 import type { FunctionCategory, FunctionInfo } from '../types';
 
-/**
- * Generates an IDA-style automatic function name (`sub_401000`, `sub_140001000`,
- * `thunk_sub_401000`, `imp_CreateFileA`, etc.) when a function lacks a meaningful symbol
- * or when auto-naming is requested.
- */
 export function generateIdaStyleFunctionName(
   rawName: string,
   virtualAddress: number,
@@ -21,7 +16,6 @@ export function generateIdaStyleFunctionName(
   const hexAddr = Math.max(0, Math.floor(virtualAddress)).toString(16).toLowerCase();
   const formattedHex = options.padFull64 && bits === 64 ? hexAddr.padStart(16, '0') : hexAddr;
 
-  // Check if Rizin gave it a generic unnamed prefix like `fcn.00401040`, `sub.00401040`, `loc.00401040`, `func_0x...`
   const isGenericRizinName =
     !cleanRaw ||
     /^fcn\.[0-9a-fA-F]+$/.test(cleanRaw) ||
@@ -54,7 +48,6 @@ export function generateIdaStyleFunctionName(
     return { autoName: `sub_${formattedHex}`, isUnnamedOrGeneric: true };
   }
 
-  // Named symbol (`sym.verify_license_key`, `main`, `DllMain`, etc.)
   if (cleanRaw === 'main' || cleanRaw === 'sym.main' || cleanRaw === '_main') {
     return { autoName: 'main', isUnnamedOrGeneric: false };
   }
@@ -148,10 +141,6 @@ export function classifyFunction(
   };
 }
 
-/**
- * Applies automatic and user-defined custom function names and comments
- * directly into C-like pseudocode or disassembly text.
- */
 export function applyCustomNamesToCode(
   code: string,
   functions: FunctionInfo[],
@@ -183,7 +172,6 @@ export function applyCustomNamesToCode(
     }
   }
 
-  // Prepend user comment on the function if present
   const fnMatch = functions.find((f) => {
     const activeName = customNames[f.address] || f.customName || f.name;
     return updated.includes(`${activeName}(`) || updated.includes(`${activeName} (`);

@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2019-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 import Extra from '../core/extra.js';
@@ -306,15 +303,15 @@ export default {
 				},
 				type: DalvikType.Number,
 			};
-			/* original register (low) */
+
 			var dst0 = Variable.local(low.opd[0], instr.bits, true);
 			var src0 = Variable.number(low.opd[1], instr.bits, true);
-			/* next register (high) */
+
 			var dst1 = Variable.local(high.opd[0], instr.bits, true);
 			var src1 = Variable.number(high.opd[1], instr.bits, true);
 			return Base.composed([
-				Base.assign(dst0, src0), // low
-				Base.assign(dst1, src1), // high
+				Base.assign(dst0, src0),
+				Base.assign(dst1, src1),
 			]);
 		},
 		'const-string': function(instr, context, instructions) {
@@ -474,7 +471,7 @@ export default {
 		'invoke-virtual-quick': _invoke_virtual,
 		'invoke-interface': _invoke_virtual,
 		'invoke-custom': _invoke_static,
-		/* array */
+
 		'aget': _aget_generic,
 		'aget-boolean': _aget_generic,
 		'aget-byte': _aget_generic,
@@ -489,7 +486,7 @@ export default {
 		'aput-object': _aput_generic,
 		'aput-short': _aput_generic,
 		'aput-wide': _aput_generic,
-		/* object */
+
 		'iget': _iget_generic,
 		'iget-boolean': _iget_generic,
 		'iget-byte': _iget_generic,
@@ -692,8 +689,7 @@ export default {
 			instr.jump = Long.from(instr.parsed.opd[0], true, 16);
 			for (var i = 0; i < instructions.length; i++) {
 				if (instructions[i].location.eq(instr.jump)) {
-					/* Sometimes happens that the jump just points to a return*
-					 * so it's easier to just set this instr to return */
+
 					if (instructions[i].assembly.startsWith('return')) {
 						instr.jump = null;
 						if (instructions[i].code) {
@@ -1005,7 +1001,7 @@ export default {
 	},
 	preanalisys: function(instructions, context) {},
 	postanalisys: function(instructions, context) {
-		// this is only for those jumps that ends in return like
+
 		while (context.missing.length > 0) {
 			var r = context.missing.pop();
 			r[0].code = instructions[r[1]].code;

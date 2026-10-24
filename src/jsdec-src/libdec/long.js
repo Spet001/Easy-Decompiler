@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 function to64(n, unsigned) {
 	if (unsigned) {
 		return BigInt.asUintN(64, n);
@@ -108,6 +105,5 @@ Long.MAX_U16_VALUE = new Long(globalThis.Limits.UT16_MAX, true);
 Long.MAX_S64_VALUE = new Long(globalThis.Limits.ST64_MAX, false);
 Long.MAX_S32_VALUE = new Long(globalThis.Limits.ST32_MAX, false);
 Long.MAX_S16_VALUE = new Long(globalThis.Limits.ST16_MAX, false);
-
 
 export default Long;

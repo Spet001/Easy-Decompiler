@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2019-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Extra from './extra.js';
 import Base from './base.js';
 
@@ -170,7 +167,7 @@ const _object_c_class_methods = {
 		},
 		'arm': _arm_stret
 	},
-	/* fixup */
+
 	objc_msgSend_fixup: {
 		'x86': _x86,
 		'ppc': {

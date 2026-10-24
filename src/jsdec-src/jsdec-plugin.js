@@ -1,18 +1,9 @@
-// SPDX-FileCopyrightText: 2017-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-FileCopyrightText: 2017-2018 pancake <pancake@nopcode.org>
-// SPDX-License-Identifier: BSD-3-Clause
-
-
 import libdec from './libdec/libdec.js';
 import rzutil from './libdec/rzutil.js';
 import rzpipe from './libdec/rzpipe.js';
 import Warning from './libdec/warning.js';
 import Printer from './libdec/printer.js';
 
-/**
- * Shared data accessible from everywhere.
- * @type {Object}
- */
 var Shared = Global();
 Shared.evars = null;
 Shared.context = null;
@@ -24,8 +15,7 @@ Shared.warning = Warning;
 function decompile_offset(architecture, fcnname) {
 	var data = new rzutil.data();
 	Shared.argdb = data.argdb;
-	// af seems to break renaming.
-	/* asm.pseudo breaks things.. */
+
 	if (data.graph && data.graph.length > 0) {
 		var p = new libdec.core.session(data, architecture);
 		var arch_context = architecture.context(data);
@@ -52,7 +42,6 @@ function main() {
 			return;
 		}
 
-		// theme (requires to be initialized after evars)
 		Shared.printer = new Printer();
 
 		var architecture = libdec.archs[Shared.evars.arch];

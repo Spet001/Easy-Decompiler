@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Condition from './condition.js';
 import Extra from './extra.js';
 import Long from '../long.js';
@@ -166,7 +163,6 @@ _instruction.swap = function(instructions, index_a, index_b) {
 
 	a.location = b.location;
 	b.location = a_loc;
-
 
 	if (a.jump && b.location.eq(a.jump)) {
 		a.jump = a.location;

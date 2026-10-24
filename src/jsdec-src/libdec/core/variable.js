@@ -1,15 +1,9 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-FileCopyrightText: 2018-2019 elicn
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Extra from './extra.js';
 import Objects from './objects.js';
 import Long from '../long.js';
 
 var _internal_label_cnt = 0;
 var _internal_variable_cnt = 0;
-
-// ---------- inner functions ----------
 
 var parenthesize = function(s) {
     return ['(', s, ')'].join('');
@@ -18,8 +12,6 @@ var parenthesize = function(s) {
 var autoParen = function(s) {
     return (s.indexOf(' ') > (-1) ? parenthesize(s) : s);
 };
-
-// ---------- inner objects ----------
 
 var _label = function(name, address) {
     this.name = name;
@@ -132,8 +124,6 @@ var _macro = function(content) {
         return define ? null : Global().printer.theme.macro(this.content);
     };
 };
-
-// ------------------------------
 
 export default {
     uniqueName: function(variable_name) {

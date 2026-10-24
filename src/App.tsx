@@ -241,7 +241,7 @@ const DecompilerCodePane: React.FC<DecompilerCodePaneProps> = ({
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#06090f]">
-      {/* Pane Header */}
+
       <div className="h-[26px] shrink-0 flex items-center justify-between border-b border-[#182232] bg-[#0c121d] px-2 text-[11px] font-mono select-none">
         <div className="flex items-center gap-1.5 truncate">
           <span className="text-[10px] font-bold text-[#00e5ff] shrink-0 font-mono">
@@ -280,7 +280,6 @@ const DecompilerCodePane: React.FC<DecompilerCodePaneProps> = ({
         </div>
       </div>
 
-      {/* Pane Body */}
       {isLoading ? (
         <div className="flex-1 flex flex-col items-center justify-center p-3 bg-[#06090f] text-center select-none font-mono">
           <div className="flex items-center gap-2 text-xs text-[#38bdf8]">
@@ -340,11 +339,11 @@ const DecompilerCodePane: React.FC<DecompilerCodePaneProps> = ({
                 key={idx}
                 className="flex items-stretch hover:bg-[#38bdf8]/[0.06] group/line"
               >
-                {/* Synchronized left address gutter */}
+
                 <div className="w-[78px] shrink-0 select-none text-right pr-2.5 text-[#475569] bg-[#06090f] border-r border-[#182232] font-mono text-[11px] tabular-nums group-hover/line:text-[#38bdf8]">
                   {lineAddr}
                 </div>
-                {/* Code line with syntax tokens */}
+
                 <div className="flex-1 pl-3 font-mono text-[12px] whitespace-pre text-[#cbd5e1]">
                   {renderHighlightedCodeLine(l, onJumpFunction)}
                 </div>
@@ -372,20 +371,17 @@ export default function App() {
   const [isDecompilingB, setIsDecompilingB] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Ready — Select a built-in sample or drop any binary');
 
-  // Function Naming, Comments, Favorites, Undo/Redo
   const [customNames, setCustomNames] = useState<Record<string, string>>({});
   const [fnComments, setFnComments] = useState<Record<string, string>>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [renameHistory, setRenameHistory] = useState<FunctionRenameAction[]>([]);
   const [redoStack, setRedoStack] = useState<FunctionRenameAction[]>([]);
 
-  // Filters & Navigation
   const [fnSearch, setFnSearch] = useState('');
   const [fnCategoryFilter, setFnCategoryFilter] = useState<FunctionCategory | 'all' | 'favorites'>('all');
   const [stringSearch, setStringSearch] = useState('');
   const [stringCategoryFilter, setStringCategoryFilter] = useState<StringHeuristicCategory | 'all'>('all');
 
-  // Theme Engine
   const [currentTheme, setCurrentTheme] = useState<ThemeId>(() => {
     const saved = localStorage.getItem('spet-decompiler-theme');
     if (saved === 'oled' || saved === 'slade' || saved === 'cobalt' || saved === 'ida') {
@@ -400,21 +396,18 @@ export default function App() {
     document.body.setAttribute('data-theme', currentTheme);
   }, [currentTheme]);
 
-  // Active Tabs & Menus
   const [centerTab, setCenterTab] = useState<CenterTab>('dual-decompiler');
   const [rightTab, setRightTab] = useState<RightInspectorTab>('metadata');
   const [bottomTab, setBottomTab] = useState<BottomDockTab>('logs');
   const [isBottomDockOpen, setIsBottomDockOpen] = useState(true);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-  // Modals & Inline Dialogs
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
   const [aboutModalTab, setAboutModalTab] = useState<'engines' | 'security' | 'about' | null>(null);
   const [renamingFn, setRenamingFn] = useState<{ address: string; currentName: string } | null>(null);
   const [commentingFn, setCommentingFn] = useState<{ address: string; currentComment: string } | null>(null);
 
-  // Logs, Rizin Console, Recent Files, Copy state
   const [logs, setLogs] = useState<WorkerLogEntry[]>([]);
   const [rizinCmdInput, setRizinCmdInput] = useState('afl');
   const [rizinCmdOutput, setRizinCmdOutput] = useState<string>('');
@@ -440,7 +433,6 @@ export default function App() {
     ]);
   }, []);
 
-  // Initialize Engines once
   useEffect(() => {
     const engA = new RizinJsdecEngine(appendLog);
     const engB = new GhidraWasmEngine(appendLog);
@@ -477,14 +469,13 @@ export default function App() {
           return;
         }
       } catch {
-        // try next candidate
+
       }
     }
     setIsAnalyzing(false);
     setStatusMessage(`Failed to locate ${smp.filename} across candidate paths.`);
   }, []);
 
-  // Sync settings
   useEffect(() => {
     saveAppSettings(settings);
     engineARef.current?.setMinStringLength(settings.minStringLength);
@@ -520,7 +511,6 @@ export default function App() {
         ]);
       }
 
-      // Fetch Disassembly + CFG + Engine A Decompilation
       engineARef.current
         .getDisassemblyLines(addr)
         .then(setDisasmLines)
@@ -769,7 +759,6 @@ export default function App() {
     });
   };
 
-  // Keyboard shortcuts
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
@@ -833,7 +822,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [selectedFnAddr, analysis, customNames, fnComments]);
 
-  // Filtered Functions & Strings
   const filteredFunctions = useMemo(() => {
     if (!analysis) return [];
     const q = fnSearch.trim().toLowerCase();
@@ -919,7 +907,6 @@ export default function App() {
     }
   };
 
-  // Section memory bar total size calculation
   const totalSectionSize = useMemo(() => {
     if (!analysis || analysis.sections.length === 0) return 1;
     return analysis.sections.reduce((acc, s) => acc + Math.max(s.size, s.virtualSize, 1), 0);
@@ -946,7 +933,7 @@ export default function App() {
         if (openMenu) setOpenMenu(null);
       }}
     >
-      {/* Hidden File Inputs */}
+
       <input
         ref={fileInputRef}
         type="file"
@@ -995,7 +982,6 @@ export default function App() {
         }}
       />
 
-      {/* Drag & Drop Overlay */}
       {isDragOver && (
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-[#06090f]/90">
           <div className="flex flex-col items-center gap-2 border border-[#38bdf8] bg-[#090d14] p-8 text-center">
@@ -1010,11 +996,8 @@ export default function App() {
         </div>
       )}
 
-      {/* ============================================================== */}
-      {/* ZONE A: Native Menu & Telemetry Topbar (h-[28px])              */}
-      {/* ============================================================== */}
       <header className="h-[28px] shrink-0 bg-[#06090f] border-b border-[#182232] px-2.5 flex items-center justify-between text-[11px] font-mono z-30 select-none">
-        {/* Left: Tool Brand + Menu Triggers */}
+
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center gap-1.5 pr-2 select-none">
             <img
@@ -1027,7 +1010,7 @@ export default function App() {
           </div>
 
           <nav className="relative flex items-center gap-0.5 text-[11px]">
-            {/* FILE MENU */}
+
             <div className="relative">
               <button
                 type="button"
@@ -1153,7 +1136,6 @@ export default function App() {
               )}
             </div>
 
-            {/* ANALYSIS MENU */}
             <div className="relative">
               <button
                 type="button"
@@ -1218,7 +1200,6 @@ export default function App() {
               )}
             </div>
 
-            {/* VIEW MENU */}
             <div className="relative">
               <button
                 type="button"
@@ -1295,7 +1276,6 @@ export default function App() {
               )}
             </div>
 
-            {/* HEX MENU */}
             <button
               type="button"
               onClick={() => setCenterTab('hex')}
@@ -1306,7 +1286,6 @@ export default function App() {
               Hex
             </button>
 
-            {/* SETTINGS MENU */}
             <button
               type="button"
               onClick={() => setShowSettingsModal(true)}
@@ -1315,7 +1294,6 @@ export default function App() {
               Settings
             </button>
 
-            {/* HELP MENU */}
             <div className="relative">
               <button
                 type="button"
@@ -1370,9 +1348,8 @@ export default function App() {
           </nav>
         </div>
 
-        {/* Center/Right: Active Telemetry + Theme Switcher + Sample Selector + Load Button */}
         <div className="flex items-center gap-2">
-          {/* Inline Active Binary Telemetry */}
+
           <div className="hidden xl:flex items-center gap-1.5 text-[11px] text-[#64748b] truncate max-w-xl">
             {analysis ? (
               <>
@@ -1391,7 +1368,6 @@ export default function App() {
             )}
           </div>
 
-          {/* Theme Selector */}
           <div className="flex items-center gap-1 shrink-0">
             <span className="text-[10px] text-[#64748b]">Theme:</span>
             <select
@@ -1407,7 +1383,6 @@ export default function App() {
             </select>
           </div>
 
-          {/* Compact sample selector dropdown */}
           <div className="flex items-center gap-1">
             <select
               value={SAMPLE_BINARIES.find((s) => s.filename === analysis?.metadata.filename)?.id || ''}
@@ -1440,7 +1415,6 @@ export default function App() {
             </button>
           </div>
 
-          {/* Worker Active Indicator / Cancel */}
           {isAnalyzing || isDecompilingA || isDecompilingB ? (
             <button
               type="button"
@@ -1455,11 +1429,8 @@ export default function App() {
         </div>
       </header>
 
-      {/* ============================================================== */}
-      {/* ZONE B: Memory Map Ribbon & Address Breadcrumb (h-[24px])      */}
-      {/* ============================================================== */}
       <div className="h-[24px] shrink-0 bg-[#0c121d] border-b border-[#182232] px-2.5 flex items-center justify-between text-[11px] font-mono select-none">
-        {/* PE/ELF Section Memory Bar */}
+
         <div className="flex items-center gap-2 flex-1 min-w-0 mr-4">
           <span className="text-[10px] uppercase tracking-wider text-[#64748b] shrink-0">
             Memory Map:
@@ -1506,7 +1477,6 @@ export default function App() {
           )}
         </div>
 
-        {/* Current Cursor Address Breadcrumb */}
         <div className="flex items-center gap-1.5 text-[11px] text-[#64748b] shrink-0">
           <span className="text-slate-500">Cursor:</span>
           <span className="text-[#38bdf8] font-bold">
@@ -1519,15 +1489,10 @@ export default function App() {
         </div>
       </div>
 
-      {/* ============================================================== */}
-      {/* 3-COLUMN WORKBENCH: Left Dock, Center Workspace, Right Dock    */}
-      {/* ============================================================== */}
       <div className="flex-1 min-h-0 flex overflow-hidden">
-        {/* ============================================================== */}
-        {/* ZONE C: Left Dock Pane (w-[270px] shrink-0 border-r border-[#182232]) */}
-        {/* ============================================================== */}
+
         <aside className="w-[270px] shrink-0 border-r border-[#182232] flex flex-col bg-[#090d14] overflow-hidden select-none">
-          {/* Header Strip */}
+
           <div className="h-[24px] bg-[#0c121d] border-b border-[#182232] px-2 flex items-center justify-between text-[11px] font-mono text-slate-300 font-semibold shrink-0">
             <div className="flex items-center gap-1.5 truncate">
               <img
@@ -1562,7 +1527,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Search & Category Filter */}
           <div className="p-1 border-b border-[#182232] bg-[#070a10] space-y-1 shrink-0">
             <div className="relative">
               <Search className="pointer-events-none absolute left-1.5 top-1 h-3 w-3 text-slate-600" />
@@ -1594,7 +1558,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Single-line Virtual Tabular Function List (35+ rows fit on screen) */}
           <div className="flex-1 overflow-y-auto divide-y divide-[#182232]/40 bg-[#090d14]">
             {filteredFunctions.map((fn) => {
               const isSelected = fn.address === selectedFnAddr;
@@ -1612,12 +1575,11 @@ export default function App() {
                       : 'hover:bg-[#38bdf8]/[0.08] text-slate-300'
                   }`}
                 >
-                  {/* Col 1: Address (75px) */}
+
                   <span className="w-[75px] shrink-0 text-[#64748b] truncate text-[10px]">
                     {fn.address}
                   </span>
 
-                  {/* Col 2: Name (flex-1) */}
                   <span className={`flex-1 truncate pr-1 flex items-center gap-1 ${isSelected ? 'text-[#38bdf8] font-bold' : 'text-[#e2e8f0]'}`}>
                     <img
                       src={`${getBaseUrl()}icons/console_prompt-0.png`}
@@ -1627,17 +1589,14 @@ export default function App() {
                     <span className="truncate">{activeName}</span>
                   </span>
 
-                  {/* Inline comment icon if present */}
                   {hasComment && (
                     <MessageSquare className="h-2.5 w-2.5 text-amber-400 shrink-0 mr-1" />
                   )}
 
-                  {/* Col 3: Size (42px) */}
                   <span className="w-[42px] shrink-0 text-right text-[#475569] text-[10px] group-hover:hidden">
                     {fn.size}B
                   </span>
 
-                  {/* Action icons revealed ONLY on group hover */}
                   <div className="hidden group-hover:flex items-center gap-1 shrink-0">
                     <span
                       className="text-[9px] px-1 py-0.2 border border-[#182232] bg-[#06090f] text-[#38bdf8] uppercase tracking-wider rounded-[2px]"
@@ -1679,11 +1638,8 @@ export default function App() {
           </div>
         </aside>
 
-        {/* ============================================================== */}
-        {/* ZONE D: Center Workspace (flex-1 flex flex-col min-w-0 bg-[#080b11]) */}
-        {/* ============================================================== */}
         <main className="flex-1 flex flex-col min-w-0 bg-[#080b11] overflow-hidden">
-          {/* Flush Rectangular IDE Dock Tabs */}
+
           <div className="h-[28px] shrink-0 bg-[#06090f] border-b border-[#182232] flex items-center justify-between select-none overflow-x-auto no-scrollbar">
             <div className="flex items-center h-full shrink-0">
               {(
@@ -1715,7 +1671,6 @@ export default function App() {
               })}
             </div>
 
-            {/* Active Function Action Pills */}
             {activeFnInfo && (
               <div className="flex items-center gap-1.5 pr-2.5 text-[11px] font-mono">
                 <button
@@ -1746,7 +1701,6 @@ export default function App() {
             )}
           </div>
 
-          {/* Inline Rename Bar if triggered */}
           {renamingFn && (
             <form
               onSubmit={(e) => {
@@ -1783,7 +1737,6 @@ export default function App() {
             </form>
           )}
 
-          {/* Inline Comment Bar if triggered */}
           {commentingFn && (
             <form
               onSubmit={(e) => {
@@ -1827,7 +1780,6 @@ export default function App() {
             </form>
           )}
 
-          {/* Primary Viewport */}
           <div className="flex-1 min-h-0 overflow-hidden bg-[#080b11]">
             {!analysis ? (
               <div className="flex h-full flex-col items-center justify-center p-3 bg-[#06090f] text-center select-none font-mono">
@@ -1868,7 +1820,7 @@ export default function App() {
               </div>
             ) : (
               <>
-                {/* DUAL DECOMPILER SPLIT */}
+
                 {centerTab === 'dual-decompiler' && (
                   <div className="grid h-full grid-cols-1 divide-y divide-[#182232] lg:grid-cols-2 lg:divide-x lg:divide-y-0">
                     <DecompilerCodePane
@@ -1923,7 +1875,6 @@ export default function App() {
                   </div>
                 )}
 
-                {/* SINGLE DECOMPILER A */}
                 {centerTab === 'decompiler-a' && (
                   <DecompilerCodePane
                     code={formattedCodeA}
@@ -1951,7 +1902,6 @@ export default function App() {
                   />
                 )}
 
-                {/* SINGLE DECOMPILER B */}
                 {centerTab === 'decompiler-b' && (
                   <DecompilerCodePane
                     code={formattedCodeB}
@@ -1979,7 +1929,6 @@ export default function App() {
                   />
                 )}
 
-                {/* DISASSEMBLY */}
                 {centerTab === 'disassembly' && (
                   <div className="flex h-full flex-col overflow-hidden bg-[#06090f]">
                     <div className="h-[26px] shrink-0 flex items-center justify-between border-b border-[#182232] bg-[#0c121d] px-2.5 text-[11px] font-mono select-none">
@@ -2024,10 +1973,8 @@ export default function App() {
                   </div>
                 )}
 
-                {/* CFG */}
                 {centerTab === 'cfg' && <CfgCanvasView cfg={cfgData} />}
 
-                {/* CALLGRAPH */}
                 {centerTab === 'callgraph' && (
                   <CallGraphCanvasView
                     callGraph={analysis?.callGraph || null}
@@ -2036,7 +1983,6 @@ export default function App() {
                   />
                 )}
 
-                {/* HEX */}
                 {centerTab === 'hex' && (
                   <HexViewerPane
                     data={binaryData}
@@ -2048,7 +1994,6 @@ export default function App() {
             )}
           </div>
 
-          {/* Collapsible Bottom Console (h-[130px] border-t border-[#182232] bg-[#05070b]) */}
           {isBottomDockOpen && (
             <div className="h-[130px] shrink-0 flex flex-col border-t border-[#182232] bg-[#05070b] overflow-hidden select-none">
               <div className="h-[24px] shrink-0 flex items-center justify-between border-b border-[#182232] bg-[#090d14] px-2 text-[11px] font-mono">
@@ -2199,11 +2144,8 @@ export default function App() {
           )}
         </main>
 
-        {/* ============================================================== */}
-        {/* ZONE E: Right Inspector Pane (w-[280px] shrink-0 border-l border-[#182232]) */}
-        {/* ============================================================== */}
         <aside className="w-[280px] shrink-0 border-l border-[#182232] flex flex-col bg-[#090d14] overflow-hidden select-none">
-          {/* Header Mode Tabs */}
+
           <div className="h-[28px] shrink-0 bg-[#06090f] border-b border-[#182232] flex items-center overflow-x-auto text-[11px] font-mono">
             {(
               [
@@ -2230,9 +2172,8 @@ export default function App() {
             ))}
           </div>
 
-          {/* Inspector Body */}
           <div className="flex-1 overflow-y-auto p-2 text-xs font-mono">
-            {/* Binary Info / Compact Property Grid (ZERO MARKETING FLUFF) */}
+
             {rightTab === 'metadata' && analysis && (
               <div className="border border-[#182232] bg-[#06090f]">
                 <div className="h-[22px] px-2 bg-[#0c121d] border-b border-[#182232] flex items-center text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider">
@@ -2262,7 +2203,7 @@ export default function App() {
                     </span>
                   </div>
                 ))}
-                {/* SHA-256 Digest */}
+
                 <div className="p-2 border-b border-[#141d2b]">
                   <div className="text-[10px] text-[#64748b]">SHA-256 Digest</div>
                   <div
@@ -2276,7 +2217,6 @@ export default function App() {
               </div>
             )}
 
-            {/* STRINGS TAB */}
             {rightTab === 'strings' && (
               <div className="flex h-full flex-col gap-1">
                 <div className="space-y-1 shrink-0 pb-1 border-b border-[#182232]">
@@ -2335,7 +2275,6 @@ export default function App() {
               </div>
             )}
 
-            {/* IMPORTS TAB */}
             {rightTab === 'imports' && analysis && (
               <div className="divide-y divide-[#182232]">
                 {analysis.imports.length === 0 ? (
@@ -2354,7 +2293,6 @@ export default function App() {
               </div>
             )}
 
-            {/* EXPORTS TAB */}
             {rightTab === 'exports' && analysis && (
               <div className="divide-y divide-[#182232]">
                 {analysis.exports.length === 0 ? (
@@ -2377,7 +2315,6 @@ export default function App() {
               </div>
             )}
 
-            {/* SECTIONS TAB */}
             {rightTab === 'sections' && analysis && (
               <div className="space-y-1.5">
                 {analysis.sections.map((sec) => (
@@ -2402,7 +2339,6 @@ export default function App() {
               </div>
             )}
 
-            {/* FUNCTION DETAILS TAB */}
             {rightTab === 'xrefs' && activeFnInfo && (
               <div className="border border-[#182232] bg-[#06090f] p-2 space-y-1.5 text-[11px] font-mono">
                 <div className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider pb-1 border-b border-[#182232]">
@@ -2448,9 +2384,6 @@ export default function App() {
         </aside>
       </div>
 
-      {/* ============================================================== */}
-      {/* ZONE E: Global Footer Status Bar (h-[22px])                    */}
-      {/* ============================================================== */}
       <footer className="h-[22px] shrink-0 z-20 bg-[#05070b] border-t border-[#182232] px-3 flex items-center justify-between text-[10px] font-mono text-slate-400 select-none">
         <div className="flex items-center gap-2 truncate">
           <span className="inline-flex items-center gap-1.5">
@@ -2496,7 +2429,6 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Modals */}
       <SettingsModal
         open={showSettingsModal}
         settings={settings}

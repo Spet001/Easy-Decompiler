@@ -62,7 +62,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         <div className="grid flex-1 grid-cols-1 gap-4 overflow-y-auto p-4 text-xs font-mono md:grid-cols-2">
-          {/* Appearance & Fonts */}
+
           <div className="space-y-2.5 border border-[#182232] bg-[#06090f] p-3">
             <h3 className="font-semibold uppercase tracking-wider text-[#38bdf8] text-[11px]">
               Appearance & Typography
@@ -121,7 +121,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             ))}
           </div>
 
-          {/* Disassembly & Decompiler Display */}
           <div className="space-y-2.5 border border-[#182232] bg-[#06090f] p-3">
             <h3 className="font-semibold uppercase tracking-wider text-[#c084fc] text-[11px]">
               Disassembly & Analysis Engine

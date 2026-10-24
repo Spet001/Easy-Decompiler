@@ -99,7 +99,7 @@ async function fetchGhidraArtifact(
         return { text, buffer, json };
       }
     } catch {
-      // try next candidate
+
     }
   }
   throw new Error(`Failed to fetch ${filename} from any candidate path`);
@@ -223,14 +223,13 @@ function buildImageXml(
 ): { xml: string; queryTarget: string } {
   const chunksXml: string[] = [];
 
-  // Map sections into virtual memory space="ram"
   const validSections = sections.filter(
     (s) => s.size > 0 && s.fileOffsetNum >= 0 && s.fileOffsetNum + s.size <= data.length
   );
 
   if (validSections.length > 0) {
     for (const sec of validSections) {
-      // Cap individual section chunk to 128 KB around functions or section start for fast XML ingest
+
       const maxLen = Math.min(sec.size, 131072);
       const slice = data.subarray(sec.fileOffsetNum, sec.fileOffsetNum + maxLen);
       const isReadOnly = !sec.permissions.includes('w') && !sec.permissions.includes('x');
@@ -241,7 +240,7 @@ function buildImageXml(
       );
     }
   } else {
-    // Fallback: parse ELF/PE headers directly or map entire binary at baseAddress
+
     const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
     let mappedFromHeaders = false;
 
@@ -263,7 +262,7 @@ function buildImageXml(
         if (off + phentsize > data.length) break;
         const p_type = dv.getUint32(off, isLE);
         if (p_type === 1) {
-          // PT_LOAD
+
           const p_offset = is64 ? Number(dv.getBigUint64(off + 8, isLE)) : dv.getUint32(off + 4, isLE);
           const p_vaddr = is64 ? Number(dv.getBigUint64(off + 16, isLE)) : dv.getUint32(off + 8, isLE);
           const p_filesz = is64 ? Number(dv.getBigUint64(off + 32, isLE)) : dv.getUint32(off + 16, isLE);
@@ -286,7 +285,6 @@ function buildImageXml(
     }
   }
 
-  // Register symbols so Ghidra emits clean function names on calls
   const symXml: string[] = [];
   const seenOffsets = new Set<string>();
   let queryTarget = targetAddress;
@@ -307,7 +305,6 @@ function buildImageXml(
     }
   }
 
-  // Ensure targetAddress itself has a symbol entry if not already in symbols
   const normTarget = `0x${(parseInt(targetAddress, 16) || 0).toString(16)}`;
   if (!seenOffsets.has(normTarget)) {
     const autoTargetName = `sub_${normTarget.replace(/^0x/, '')}`;
@@ -339,7 +336,6 @@ async function handleOpenBinary(
   currentMetadata = inspectBinaryHeaders(currentBinaryData, filename, sha256, null, currentSections);
   activeArchId = resolveGhidraArchId(currentBinaryData, currentMetadata);
 
-  // Pre-warm Sleigh specification cache for instant decompilation
   await getSpecsForArch(activeArchId, currentMetadata.os);
 
   postProgress(`Ghidra Sleigh architecture ready: ${activeArchId}`, 'success');
@@ -392,7 +388,6 @@ async function handleDecompile(address: string): Promise<DecompilationResult> {
     ghidraMod._free(slaPtr);
   }
 
-  // Extract Decompiler Messages comment block if present
   let cleanCode = rawOutput.trim();
   const msgMatch = cleanCode.match(/^\/\* Decompiler Messages:\n([\s\S]*?)\*\/\n?/);
   if (msgMatch) {

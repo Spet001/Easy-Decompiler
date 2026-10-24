@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 
@@ -65,14 +62,14 @@ var _move_multiple = function(instr, context) {
 	var incr = (e.bits / 8).toString();
 	var ops = [];
 	if (e.opd[0].pointer) {
-		//movem.l -(a7), d2-d3/a2-a5
+
 		memory = _as_pointer(e, 0, false);
 		pointer = e.opd[0].register;
 		postadd = e.opd[0].postadd;
 		register = e.opd[1].register;
 		op = Base.read_memory;
 	} else {
-		//movem.l d2-d3/a2-a5, -(a7)
+
 		memory = _as_pointer(e, 1, false);
 		pointer = e.opd[1].register;
 		postadd = e.opd[1].postadd;
@@ -345,20 +342,6 @@ export default {
 		const expr = /([a-zA-Z]+)(\.[bwl])?\s+([\w.:_-]+\([\w. *,[\]]+\)|-?\([\w. *,[\]]+\)\+?|[\w./:_-]+)(?:,\s+([\w.:_-]+\([\w. *,[\]]+\)|-?\([\w. *,[\]]+\)\+?|[\w./:_-]+))?/;
 		var token = asm.match(expr);
 		token.shift();
-		/*
-		 * [
-			 "move.l obj.__unctrl(d0.l * 4), -(a7)",
-			 "move",
-			 ".l",
-			 "obj.__unctrl(d0.l * 4)",
-			 "-(a7)"
-		 * ]
-		 * token[0] = assembly
-		 * token[1] = mnem
-		 * token[2] = bits
-		 * token[3] = opd0
-		 * token[4] = opd1
-		 */
 
 		var mnem = token.shift();
 		var bits = token.shift();

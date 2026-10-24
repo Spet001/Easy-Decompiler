@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2017-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import _6502 from './arch/6502.js';
 import _8051 from './arch/8051.js';
 import arm from './arch/arm.js';

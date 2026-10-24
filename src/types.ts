@@ -164,7 +164,7 @@ export interface SectionInfo {
   fileOffsetNum: number;
   size: number;
   virtualSize: number;
-  permissions: string; // e.g. 'r-x', 'rw-', 'r--'
+  permissions: string;
   flags: string;
   entropy: number;
   functionsCount: number;

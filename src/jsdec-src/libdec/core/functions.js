@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2017-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import rzpipe from '../rzpipe.js';
 import Utils from './utils.js';
 
@@ -33,9 +30,6 @@ var create_fcn_data = function(x) {
     };
 };
 
-/*
- * Expects the aflj json as input.
- */
 export default function(aflj, sort_by_name) {
     this.data = aflj.sort(sort_by_name ? _compare_name : _compare_offsets).map(function(x) {
         return create_fcn_data(x);

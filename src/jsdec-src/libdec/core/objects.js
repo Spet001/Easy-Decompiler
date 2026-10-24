@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2019-2021 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Extra from './extra.js';
 
 const _java = {

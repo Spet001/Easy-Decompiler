@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2017-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import libdec from './libdec/libdec.js';
 import Printer from './libdec/printer.js';
 import TestSuite from './libdec/testsuite.js';
@@ -14,8 +11,7 @@ function main() {
         Shared.printer = new Printer();
         Shared.context = new libdec.context();
         var architecture = libdec.archs[Shared.evars.arch];
-        // af seems to break renaming.
-        /* asm.pseudo breaks things.. */
+
         if (test.data.graph && test.data.graph.length > 0) {
             var p = new libdec.core.session(test.data, architecture, Shared.evars);
             var arch_context = architecture.context(test.data);

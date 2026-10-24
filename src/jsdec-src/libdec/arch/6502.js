@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2019-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 
@@ -44,7 +41,7 @@ function _math_rotate(op, instr, bits) {
 	var srcA = _arg(instr, 0);
 	var srcB = _arg(instr, 1);
 	if (!srcB) {
-		// destination, source_a, source_b, bits
+
 		return op(_REG.accumulator, srcA, bits, 16);
 	}
 	return Base.composed([
@@ -60,7 +57,7 @@ function _load(instr, register, bits) {
 	var srcB = _arg(instr, 1);
 	var ops = [];
 	if (typeof srcA == "string") {
-		// pointer, register, bits, is_signed
+
 		ops.push(Base.read_memory(register, register, srcA, bits));
 	} else {
 		ops.push(Base.assign(register, srcA));
@@ -79,7 +76,7 @@ function _store(instr, register, bits) {
 	var srcB = _arg(instr, 1);
 	var ops = [];
 	if (typeof srcA == "string") {
-		// pointer, register, bits, is_signed
+
 		ops.push(Base.write_memory(register, register, srcA, bits));
 	} else {
 		ops.push(Base.assign(srcA, register));

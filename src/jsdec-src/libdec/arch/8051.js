@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2021-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 

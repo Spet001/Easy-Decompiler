@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Long from '../long.js';
 
 var Bounds = function(low, hi) {
@@ -66,7 +63,7 @@ export default function _block(bounds) {
 			var last = this.instructions[l - 1];
 			this.bounds = new Bounds(first.location, last.location);
 		} else {
-			// invalidate this block if is empty..
+
 			this.bounds = Bounds.invalid();
 		}
 	};
@@ -118,11 +115,11 @@ export default function _block(bounds) {
 				t++;
 			}
 		}
-		//this one is bad, but it still require to be executed.
+
 		for (i = h; i < this.extraHead.length; i++) {
 			this.extraHead[i].print();
 		}
-		//this one is ok.
+
 		for (i = t; i < this.extraTail.length; i++) {
 			this.extraTail[i].print();
 		}

@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Instruction from '../core/instruction.js';
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
@@ -30,7 +27,7 @@ var _load = function(instr, context, instruction, signed, bits) {
 		ops.push(Base.read_memory(value, e.opd[1], bits, signed));
 		return Base.composed(ops);
 	}
-	//pointer, register, bits, is_signed
+
 	return Base.read_memory(e.opd[0], e.opd[1], bits, signed);
 };
 
@@ -48,7 +45,7 @@ var _store = function(instr, context, instruction, signed, bits) {
 		ops.push(Base.write_memory(value, e.opd[0], bits, signed));
 		return Base.composed(ops);
 	}
-	//pointer, register, bits, is_signed
+
 	return Base.write_memory(e.opd[1], e.opd[0], bits, signed);
 };
 
@@ -362,7 +359,7 @@ export default {
 		};
 	},
 	preanalisys: function(instructions) {
-		/* delayed branch fix */
+
 		for (var i = 0; i < (instructions.length - 1); i++) {
 			var op = instructions[i].parsed.mnem;
 			var n = instructions[i + 1].parsed.mnem;
@@ -373,7 +370,7 @@ export default {
 		}
 	},
 	postanalisys: function(instructions, context) {
-		/* simplifies any load address 32/64 bit */
+
 		for (var i = 0; i < instructions.length; i++) {
 			if (instructions[i].parsed.mnem == 'sethi') {
 				i = sethi32(instructions[i], i, instructions);

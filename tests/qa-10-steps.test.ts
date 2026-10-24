@@ -8,31 +8,29 @@ import { generateMarkdownReport, serializeProjectBundle } from '../src/analysis/
 import type { AnalysisResult, BinaryMetadata, FunctionInfo, SavedProject, SectionInfo } from '../src/types';
 
 describe('10-Point QA Verification Suite — Easy Decompiler', () => {
-  // Step 1: Binary Header Detection & Magic Signatures
+
   it('QA Step 1: Detects binary formats and architectures accurately', () => {
-    // PE32 MZ with full DOS stub
+
     const peBuf = new Uint8Array(128);
     peBuf[0] = 0x4D;
-    peBuf[1] = 0x5A; // MZ
+    peBuf[1] = 0x5A;
     const view = new DataView(peBuf.buffer);
-    view.setUint32(0x3C, 0x40, true); // e_lfanew -> 0x40
+    view.setUint32(0x3C, 0x40, true);
     peBuf[0x40] = 0x50;
-    peBuf[0x41] = 0x45; // PE\0\0
-    view.setUint16(0x44, 0x014c, true); // IMAGE_FILE_MACHINE_I386
-    view.setUint16(0x58, 0x010b, true); // IMAGE_NT_OPTIONAL_HDR32_MAGIC
+    peBuf[0x41] = 0x45;
+    view.setUint16(0x44, 0x014c, true);
+    view.setUint16(0x58, 0x010b, true);
     const peMeta = inspectBinaryHeaders(peBuf, 'test.exe', 'deadbeef');
     expect(peMeta.format).toContain('PE32');
     expect(peMeta.size).toBe(128);
 
-    // ELF64 test (requires 64 bytes for full header inspection)
     const elfBuf = new Uint8Array(64);
-    elfBuf.set([0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00]); // ELF64 little-endian
+    elfBuf.set([0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00]);
     const elfMeta = inspectBinaryHeaders(elfBuf, 'test.elf', 'beefcafe');
     expect(elfMeta.format).toBe('ELF64');
     expect(elfMeta.bits).toBe(64);
   });
 
-  // Step 2: Entropy Calculation
   it('QA Step 2: Computes Shannon entropy accurately for crypto/packed detection', () => {
     const zeroBuf = new Uint8Array(1024).fill(0);
     const zeroEntropy = calculateEntropy(zeroBuf);
@@ -44,7 +42,6 @@ describe('10-Point QA Verification Suite — Easy Decompiler', () => {
     expect(randEntropy).toBeGreaterThan(7.9);
   });
 
-  // Step 3: SHA-256 Checksum Calculation
   it('QA Step 3: Computes SHA-256 hexadecimal hash correctly', async () => {
     const testData = new TextEncoder().encode('EasyDecompiler-QA-2026');
     const hash = await computeSha256Hex(testData);
@@ -52,7 +49,6 @@ describe('10-Point QA Verification Suite — Easy Decompiler', () => {
     expect(hash).toMatch(/^[0-9a-f]{64}$/);
   });
 
-  // Step 4: Authentic GFWL Setup Sample Analysis
   it('QA Step 4: Correctly reads and parses authentic gfwlivesetup.exe sample', () => {
     const samplePath = path.resolve(__dirname, '../public/samples/gfwlivesetup.exe');
     expect(fs.existsSync(samplePath)).toBe(true);
@@ -68,7 +64,6 @@ describe('10-Point QA Verification Suite — Easy Decompiler', () => {
     expect(meta.size).toBe(642712);
   });
 
-  // Step 5: Function Classification Heuristics
   it('QA Step 5: Classifies function names into security & reverse engineering categories', () => {
     const exportsSet = new Set<number>([0x401000]);
     const importsSet = new Set<number>([0x408000]);
@@ -83,7 +78,6 @@ describe('10-Point QA Verification Suite — Easy Decompiler', () => {
     expect(resThunk.isThunk).toBe(true);
   });
 
-  // Step 6: Stripped Function IDA-Style Auto-Naming
   it('QA Step 6: Generates standardized sub_* IDA auto-names for stripped binaries', () => {
     const res1 = generateIdaStyleFunctionName('fcn.00401080', 0x401080, { isEntry: false, isImported: false, isThunk: false });
     expect(res1.autoName).toBe('sub_401080');
@@ -93,7 +87,6 @@ describe('10-Point QA Verification Suite — Easy Decompiler', () => {
     expect(res2.autoName).toBe('_start');
   });
 
-  // Step 7: String Extraction & Heuristic Categorization
   it('QA Step 7: Extracts ASCII/UTF strings and classifies URLs, registry keys and file paths', () => {
     const rawContent = 'https://login.live.com/auth\0AES-256-CBC\0C:\\Windows\\System32\\kernel32.dll\0';
     const rawBytes = new TextEncoder().encode(rawContent);
@@ -116,7 +109,6 @@ describe('10-Point QA Verification Suite — Easy Decompiler', () => {
     expect(fileStr?.categories).toContain('DLL/Library');
   });
 
-  // Step 8: Live Function Rename Synchronization Across Decompiler AST
   it('QA Step 8: Propagates user custom symbol renames across decompiled C output', () => {
     const originalCode = `
 int sub_401080(char *key) {
@@ -182,7 +174,6 @@ int sub_401080(char *key) {
     expect(renamed).not.toContain('sub_401040');
   });
 
-  // Step 9: Report Generation & Markdown Export
   it('QA Step 9: Serializes complete binary analysis report in clean Markdown', () => {
     const meta: BinaryMetadata = {
       filename: 'gfwlivesetup.exe',
@@ -249,7 +240,6 @@ int sub_401080(char *key) {
     expect(report).toContain('KERNEL32.dll');
   });
 
-  // Step 10: Standalone Project Bundle Serialization
   it('QA Step 10: Bundles and serializes local-first project bundle without external dependencies', () => {
     const project: SavedProject = {
       id: 'proj-1',

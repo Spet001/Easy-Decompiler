@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import rzpipe from '../rzpipe.js';
 import Utils from './utils.js';
 import Long from '../long.js';
@@ -26,9 +23,6 @@ var _sanitize = function(x) {
 	return x.paddr || x.vaddr;
 };
 
-/*
- * Expects the isj json as input.
- */
 export default function(isj) {
 	this.data = isj.filter(_sanitize).sort(Global().evars.honor.paddr ? _physical_compare : _virtual_compare).map(function(x) {
 		return {

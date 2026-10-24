@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2019-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 const _syscall_table = {
 	'10': {
 		arch: 'x86',
@@ -213,7 +210,7 @@ const _syscall_table = {
 	},
 	'80': {
 		arch: 'x86|arm|ppc|sparc',
-		//comment: 'linux syscalls',
+
 		table: {
 			'0': {
 				name: 'sys_restart_syscall',

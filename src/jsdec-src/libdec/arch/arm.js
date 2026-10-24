@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2017-2021 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 import ObjC from '../core/objc.js';
@@ -81,7 +78,6 @@ var _memory = function(op, instr, context, bits, signed) {
         return assign_stack;
     }
 
-    //signed = signed || false;
     var e = instr.parsed.opd;
     var mem, arg;
     if (e[0] == 'lr') {
@@ -94,7 +90,7 @@ var _memory = function(op, instr, context, bits, signed) {
     if (e.length == 2 && typeof e[1] == 'string') {
         return Base.assign(e[0], instr.string || e[1]);
     } else if (e.length == 2) {
-        //str A, [B...] is *((u32*) B...) = A;
+
         mem = e[1].slice();
         if (mem.length < 3) {
             return op(mem.join(' + ').replace(/\+ -/, '- '), e[0], bits, false);
@@ -172,27 +168,13 @@ var _fill_empty_args = function(reg, index, registers) {
 };
 
 var _fix_arg = function(instr) {
-    //var t = instr.code.toString();
-    //if (t.match(/^.+[+-|&^*/%]=\s/) || t.match(/^\s[+-|&^*/%]\s/)) {
-    //instr.valid = false;
+
     return instr.string ? Variable.string(instr.string) : Variable.local(instr.parsed.opd[0], _register_size(instr.parsed.opd[0]));
-    //}
-    //t = t.replace(/^.+\s=\s/, '').trim();
-    //instr.valid = false;
-    //return instr.string ? Variable.string(instr.string) : Variable.local(t, _register_size(t));
+
 };
 
-/**
- * For a given local variable `name`, retreive its offset from the frame base. This become handy when
- * local variables are referred by their name, but there is a need to query their offset; e.g. returns
- * 16 when a variable is referred by rbp + 16.
- * @param {string} name A string literal
- * @param {Object} context
- * @returns {number} Offset from frame base (in bytes), or undefined if no such variable name or
- * variable exists, but is not on stack
- */
 var _get_var_offset = function(name, context) {
-    // TODO: could be done simply with 'find' on ES6, unfortunately Duktape does not recognize it yet
+
     var info;
 
     context.vars.forEach(function(v) {
@@ -204,13 +186,6 @@ var _get_var_offset = function(name, context) {
     return info && info.storage.type === "stack" ? info.storage.stack_off : undefined;
 };
 
-/**
- * Return a list of the cdecl function call arguments.
- * @param {Array<Object>} instrs Array of instructions preceding the function call
- * @param {number} nargs Number of arguments expected for this function call
- * @param {Object} context Context object
- * @returns {Array<Variable>} An array of arguments instances, ordered as declared in callee
- */
 var _populate_cdecl_call_args = function(instrs, nargs, context) {
     var _regs64 = ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6'];
     var _regs32 = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6'];
@@ -227,27 +202,16 @@ var _populate_cdecl_call_args = function(instrs, nargs, context) {
             arm64 = true;
         }
 
-        // passing argument by referring to stack pointer directly rather than pushing
         if (mnem === 'adrp') {
-            // normally arguments will be passed in the order they are defined at the callee declaration. however
-            // it is not guaranteed, so we will need the stack offset that is used to determine which argument
-            // is being set; for example, "mov val [a + b]" indicates that the 3rd argument is being set
 
             var offset;
 
-            // opd1 may be set to a variable name, and therefore mask the stack pointer dereference. for that
-            // reason we also check whether it appears as a stack variable, to extract its offset from stack pointer.
-            // [another option would be undefining that variable manually using the "afvs-" rizin command]
-
-            // check whether this is a plain stack pointer dereference, or a stack pointer dereference masekd by a
-            // variable name. if the former, extract the offset manually; if the latter, use rizin data to retreive
-            // that value.
             if (opd1.mem_access && _is_stack_reg(opd1)) {
                 offset = 0;
             } else if (_is_stack_based_local_var(opd1, context)) {
                 offset = Math.abs(_get_var_offset(opd1, context));
             } else {
-                // an irrelevant 'mov' isntruction; nothing to do here
+
                 continue;
             }
 
@@ -258,7 +222,6 @@ var _populate_cdecl_call_args = function(instrs, nargs, context) {
             nargs--;
         }
 
-        // passing argument by pushing them to stack
         if (mnem === 'push') {
             arg = instrs[i].string ? Variable.string(instrs[i].string) : Variable.local(opd1, _register_size(opd1));
 
@@ -278,13 +241,6 @@ function _is_stack_reg(register) {
     return register && register.indexOf('sp') >= 0;
 }
 
-/**
- * Indicates whether the current function has a local variable named `name`.
- * @param {string} name A string literal
- * @param {Object} context
- * @returns {boolean}
- */
-
 var _is_local_var = function(name, context) {
     return context.vars.some(function(v) {
         return (v.name === name);
@@ -297,13 +253,6 @@ var _is_stack_based_local_var = function(name, context) {
     });
 };
 
-/**
- * Return a list of the amd64 systemv function call arguments.
- * @param {Array<Object>} instrs Array of instructions preceding the function call
- * @param {number} nargs Number of arguments expected for this function call
- * @param {Object} context Context object (not used)
- * @returns {Array<Variable>} An array of arguments instances, ordered as declared in callee
- */
 var _populate_arm64_call_args = function(instrs, nargs, context, varargs) {
     var _regs64 = ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6'];
     var _regs32 = ['w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6'];
@@ -312,37 +261,22 @@ var _populate_arm64_call_args = function(instrs, nargs, context, varargs) {
     var i;
     var args = _regs64.slice(0, nargs);
 
-    // scan the preceding instructions to find where args registers are used, to take their values
     for (i = (instrs.length - 1); i >= 0 && (nargs > 0 || varargs); i--) {
         var op = instrs[i].parsed.mnem;
         var opd1 = instrs[i].parsed.opd[0];
         var opd2 = instrs[i].parsed.opd[1];
-        //var opd3 = instrs[i].parsed.opd[2];
 
         if (op == 'pop' || op.startsWith('cb') || op.startsWith('b') || op.startsWith('tb')) {
             break;
         }
 
-        // look for an instruction that has two arguments. we assume that such an instruction would use
-        // its second operand to set the value of the first. although this is not an accurate observation,
-        // it could be used to replace the argument with its value on the arguments list
         if (opd2) {
             var argidx = armregs.indexOf(opd1) % _regs64.length;
 
-            // is destination operand an register argument which has not been considered yet?
-            //if ((argidx > (-1)) && (typeof args[argidx] === 'string') && !opd3) {
-            //    // take the second operand value, that is likely to be used as the first operand's
-            //    // initialization value.
-            //    var arg = instrs[i].string ? Variable.string(instrs[i].string) : (Array.isArray(opd2) ? 
-            //       Variable.pointer(opd2.join(' + '), _register_size(Math.max(opd2.map(_register_size)))) : Variable.local(opd2, _register_size(opd2)));
-            //    instrs[i].valid = false;
-            //    args[argidx] = arg;
-            //    nargs--;
-            //} else {
             var arg = instrs[i].string ? Variable.string(instrs[i].string) : Variable.local(opd1, _register_size(opd1));
             args[argidx] = arg;
             nargs--;
-            //}
+
         }
     }
 
@@ -352,19 +286,11 @@ var _populate_arm64_call_args = function(instrs, nargs, context, varargs) {
     return args;
 };
 
-/**
- * Return a list of the amd64 systemv function call arguments.
- * @param {Array<Object>} instrs Array of instructions preceding the function call
- * @param {number} nargs Number of arguments expected for this function call
- * @param {Object} context Context object (not used)
- * @returns {Array<Variable>} An array of arguments instances, ordered as declared in callee
- */
 var _populate_arm_call_args = function(instrs, nargs, context, varargs) {
     var armregs = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6'];
     var i;
     var args = armregs.slice(0, nargs);
 
-    // scan the preceding instructions to find where args registers are used, to take their values
     for (i = (instrs.length - 1); i >= 0 && (nargs > 0 || varargs); i--) {
         var op = instrs[i].parsed.mnem;
         if (!instrs[i].parsed.opd) {
@@ -372,32 +298,18 @@ var _populate_arm_call_args = function(instrs, nargs, context, varargs) {
         }
         var opd1 = instrs[i].parsed.opd[0];
         var opd2 = instrs[i].parsed.opd[1];
-        //var opd3 = instrs[i].parsed.opd[2];
 
         if (op == 'pop' || op.startsWith('cb') || op.startsWith('b') || op.startsWith('tb')) {
             break;
         }
 
-        // look for an instruction that has two arguments. we assume that such an instruction would use
-        // its second operand to set the value of the first. although this is not an accurate observation,
-        // it could be used to replace the argument with its value on the arguments list
         if (opd2) {
             var argidx = armregs.indexOf(opd1) % armregs.length;
 
-            // is destination operand an register argument which has not been considered yet?
-            //if ((argidx > (-1)) && (typeof args[argidx] === 'string') && !opd3) {
-            //    // take the second operand value, that is likely to be used as the first operand's
-            //    // initialization value.
-            //    var arg = instrs[i].string ? Variable.string(instrs[i].string) : (Array.isArray(opd2) ? 
-            //       Variable.pointer(opd2.join(' + '), _register_size(Math.max(opd2.map(_register_size)))) : Variable.local(opd2, _register_size(opd2)));
-            //    instrs[i].valid = false;
-            //    args[argidx] = arg;
-            //    nargs--;
-            //} else {
             var arg = instrs[i].string ? Variable.string(instrs[i].string) : Variable.local(opd1, _register_size(opd1));
             args[argidx] = arg;
             nargs--;
-            //}
+
         }
     }
 
@@ -407,27 +319,17 @@ var _populate_arm_call_args = function(instrs, nargs, context, varargs) {
     return args;
 };
 
-/**
- * Try to guess the number of arguments passed to a specific cdecl function call, when
- * number of arguments is either unknown or may vary (i.e. like in variadic functions).
- * @param {Array<Object>} instrs Array of instructions preceding the function call
- * @param {Object} context Context object
- * @returns {number} Number of guessed arguments passed in this cdecl function call
- */
 var _guess_cdecl_nargs = function(instrs, context) {
     var nargs = 0;
 
-    // scan preceding instructions backwards, in order to find evidece for passed args
     for (var i = (instrs.length - 1); i >= 0; i--) {
         var mnem = instrs[i].parsed.mnem;
         var opd1 = instrs[i].parsed.opd[0];
 
-        // a "push" instruction which is not the function's prologue indicates
-        // that it is probably a function's argument
         if ((mnem.startsWith('st') || mnem.startsWith('ldr') || mnem.startsWith('mov')) && _is_stack_reg(opd1)) {
             nargs++;
         } else if (instrs[i].jump || ((mnem === 'add') && _is_stack_reg(opd1))) {
-            // reached the previous function call cleanup, stop searching
+
             break;
         }
     }
@@ -439,14 +341,14 @@ function _get_return_value_register(instr, instructions, args) {
     var start = instructions.indexOf(instr);
     var nextinstr = instructions[start + 1];
     if (nextinstr && ['mov r7, r7', 'mov x29, x29'].indexOf(nextinstr.assembly) >= 0) {
-        // ObjC marker. two instructions to skip
+
         nextinstr = instructions[start + 3];
     }
     if (nextinstr) {
         if (nextinstr.parsed.mnem &&
             nextinstr.parsed.mnem.charAt(0) == 'c' &&
             nextinstr.parsed.opd[0] == 'r0') {
-            // cbz/cmp
+
             return 'r0';
         } else if (nextinstr.parsed.opd[1] == 'r0') {
             return 'r0';
@@ -455,7 +357,7 @@ function _get_return_value_register(instr, instructions, args) {
         } else if (nextinstr.parsed.mnem &&
             nextinstr.parsed.mnem.charAt(0) == 'c' &&
             nextinstr.parsed.opd[0] == 'w0') {
-            // cbz/cmp
+
             return 'w0';
         } else if (nextinstr.parsed.opd[1] == 'w0') {
             return 'w0';
@@ -464,7 +366,7 @@ function _get_return_value_register(instr, instructions, args) {
         } else if (nextinstr.parsed.mnem &&
             nextinstr.parsed.mnem.charAt(0) == 'c' &&
             nextinstr.parsed.opd[0] == 'x0') {
-            // cbz/cmp
+
             return 'x0';
         } else if (nextinstr.parsed.opd[1] == 'x0') {
             return 'x0';
@@ -489,7 +391,6 @@ var _call = function(instr, context, instructions) {
     if (Global().evars.archbits == 16 && callee && callee.calltype == 'arm64') {
         callee = null;
     }
-
 
     if (ObjC.is(callname)) {
         var pargs, receiver, selector, pcounted = 0;
@@ -537,8 +438,7 @@ var _call = function(instr, context, instructions) {
                         }
                         if (marker && marker[opd2]) {
                             marker[opd2].instr.valid = false;
-                            //bits = Global().evars.archbits > 32 ? 64 : 32;
-                            //vtype = marker[opd2].instr.parsed.mnem.startsWith('ld') ? 'pointer' : 'local';
+
                             ret = marker[opd2].instr.string || marker[opd2].instr.klass;
                             if (ret) {
                                 return ret;
@@ -551,7 +451,7 @@ var _call = function(instr, context, instructions) {
                 return reg;
             });
             for (j = 0; j < pargs.length; j++) {
-                //seen = [];
+
                 for (i = subslice.length - 1; i >= 0; i--) {
                     if (!subslice[i].parsed.mnem || subslice[i].parsed.mnem.startsWith('b') || subslice[i].jump) {
                         break;
@@ -584,11 +484,10 @@ var _call = function(instr, context, instructions) {
             }
             var call = Base.objc_call(args[0], args[1], pargs.slice(0, pcounted));
             if (current == instructions.length - 1) {
-                // ControlFlow does not interpret well the specific case of a tail jmp through
-                // a register. in this case, we will need to emit an explicit return statement
+
                 return Base.return(call);
             } else if (returnval) {
-                // if return value is used, assign it. otherwise just emit the call
+
                 return Base.assign(returnval, call);
             }
         }
@@ -601,15 +500,11 @@ var _call = function(instr, context, instructions) {
             'aarch64': _populate_arm64_call_args
         }[callee.calltype] || (Global().evars.archbits === 64 ? _populate_arm64_call_args : _populate_arm_call_args);
 
-        // every non-import callee has a known number of arguments
-        // for imported libc functions, get the number of arguments out of a predefined list
         varargs = Extra.find.call_additional(callee.name);
         var nargs = callee.name.startsWith('sym.') ?
             Extra.find.arguments_number(callee.name) :
             callee.nargs;
 
-        // if number of arguments is unknown (either an unrecognized or a variadic function),
-        // try to guess the number of arguments
         if (nargs == (-1) && callee.calltype == 'cdecl') {
             nargs = _guess_cdecl_nargs(instructions.slice(0, current), context);
         } else if (nargs == (-1)) {
@@ -729,13 +624,13 @@ var _arm_ret = function(instr, context, instructions) {
         returnval = instructions[start - 1].parsed.opd[0];
     } else if (context.markers[instr.marker]) {
         if (context.markers[instr.marker]['r0'] && context.markers[instr.marker]['r0'].instr.valid) {
-            //context.markers[instr.marker]['r0'].instr.valid = false;
+
             returnval = '0x' + context.markers[instr.marker]['r0'].value.toString(16);
         } else if (context.markers[instr.marker]['w0'] && context.markers[instr.marker]['w0'].instr.valid) {
-            //context.markers[instr.marker]['w0'].instr.valid = false;
+
             returnval = '0x' + context.markers[instr.marker]['w0'].value.toString(16);
         } else if (context.markers[instr.marker]['x0'] && context.markers[instr.marker]['x0'].instr.valid) {
-            //context.markers[instr.marker]['x0'].instr.valid = false;
+
             returnval = '0x' + context.markers[instr.marker]['x0'].value.toString(16);
         }
     }
@@ -1272,7 +1167,7 @@ var _arm = {
             return op(e.opd[0], '(' + e.slice(3).join(' ') + ')', e.opd[1]);
         },
         ubfx: function(instr) {
-            //UBFX dest, src, lsb, width
+
             var dest = instr.parsed.opd[0];
             var src = instr.parsed.opd[1];
             var lsb = instr.parsed.opd[2];
@@ -1285,7 +1180,7 @@ var _arm = {
         uxth: function(instr) {
             return Base.cast(instr.parsed.opd[0], instr.parsed.opd[1], Extra.to.type(16, true));
         },
-        /* ARM64 */
+
         blr: _call,
         bic: function(instr, context, instructions) {
             return Base.bit_mask(instr.parsed.opd[0], instr.parsed.opd[1], instr.parsed.opd[2]);
@@ -1299,10 +1194,7 @@ var _arm = {
             ]);
         },
         bfi: function(instr, context, instructions) {
-            /*
-            	BFI R9, R2, #8, #12; 
-            	Replace bit 8 to bit 19 (12 bits) of R9 with bit 0 to bit 11 from R2.
-            */
+
             var arg0 = Variable.uniqueName();
             var arg1 = Variable.uniqueName();
             return Base.composed([
@@ -1433,7 +1325,6 @@ var _arm = {
             var val = Long.from(opds[1], true, opds[1].indexOf('0x') == 0 ? 16 : 10);
             var mask = Long.from(0xffff, true);
 
-
             if (instr.parsed.opd.length != 2) {
                 var shift = parseInt(opds[3]);
                 mask = mask.shl(shift);
@@ -1544,7 +1435,7 @@ var _arm = {
             }
             return Base.nop();
         },
-        /* SIMD/FP */
+
         stur: function(instr, context) {
             return _memory(Base.write_memory, instr, context, _reg_bits[instr.parsed.opd[0][0]]);
         },
@@ -1562,7 +1453,7 @@ var _arm = {
         }
     },
     parse: function(asm, orig) {
-        /* do some magic here to get arm xrefs */
+
         if (rizin && orig.match(/ldr \w\d+.*\[pc, 0x[\da-fA-F]+\]/)) {
             asm = orig;
         } else if (asm.match(/aav\.[\da-fA-F]+/)) {
@@ -1574,8 +1465,7 @@ var _arm = {
         ret = ret.replace(/\{|\}/g, ' ').replace(/#/g, ' ');
         ret = ret.replace(/\s+/g, ' ');
         ret = ret.replace(/str\./g, 'str_');
-        //constant zero regs wz[rw]/xz[rw]
-        //ret = ret.replace(/\bwzr\b|\bwzw\b|\bxzw|\bxzr\b/g, "0");
+
         ret = ret.replace(/aav\.0x/g, "aav_");
         ret = ret.replace(/-\s/g, "-").trim().split(' ');
         var ops = [ret[0]];
@@ -1689,7 +1579,7 @@ function _apply_new_assign(register, data) {
 
 var _value_at = function(address) {
     if (rizin) {
-        //this is truly an hack
+
         var bytes = Global().evars.archbits > 32 ? 8 : 4;
         var p = JSON.parse(rizin.command('pxj ' + bytes + ' @ 0x' + address.toString(16)).trim()).reverse().map(function(x) {
             x = x.toString(16);

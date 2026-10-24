@@ -54,7 +54,7 @@ export function classifyStringHeuristics(value: string): {
   if (/\b(ELF|PE32|MZ|PNG|JFIF|ZIP|PDF-|SQLite\s+format)\b/.test(trimmed)) {
     categories.push('FileFormat');
   }
-  // Heuristic-only token/key pattern (never claim a secret was found definitively)
+
   if (
     /(AIza[0-9A-Za-z-_]{20,}|ghp_[0-9A-Za-z]{20,}|eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+|[0-9a-fA-F]{32,64})/.test(
       trimmed
@@ -129,7 +129,6 @@ export function extractBinaryStrings(
     }
   }
 
-  // Also scan raw bytes for ASCII/UTF-8 and UTF-16LE/BE strings to ensure complete coverage
   const mapOffsetToVaddr = (paddr: number): number => {
     for (const sec of sections) {
       if (paddr >= sec.fileOffsetNum && paddr < sec.fileOffsetNum + sec.size) {
@@ -139,7 +138,6 @@ export function extractBinaryStrings(
     return paddr;
   };
 
-  // Scan ASCII / UTF-8
   let start = -1;
   const maxScan = Math.min(data.length, 2 * 1024 * 1024);
   for (let i = 0; i < maxScan; i++) {
@@ -176,7 +174,6 @@ export function extractBinaryStrings(
     }
   }
 
-  // Scan UTF-16LE wide strings
   let wStart = -1;
   let wChars: number[] = [];
   for (let i = 0; i + 1 < Math.min(data.length, 512 * 1024); i += 2) {

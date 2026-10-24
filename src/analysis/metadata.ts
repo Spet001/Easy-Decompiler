@@ -29,10 +29,10 @@ export async function computeSha256Hex(data: Uint8Array): Promise<string> {
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('');
     } catch {
-      // Fallback below
+
     }
   }
-  // Pure JS fallback hash if crypto.subtle unavailable
+
   let h1 = 0xdeadbeef ^ data.length;
   let h2 = 0x41c6ce57 ^ data.length;
   for (let i = 0; i < data.length; i++) {
@@ -72,7 +72,6 @@ export function inspectBinaryHeaders(
   let packerDetails = entropy >= 7.15 ? `High Shannon entropy (${entropy.toFixed(2)} bits/byte) suggests packing or compressed payload` : 'None detected (normal section entropy)';
   const libraries: string[] = [];
 
-  // 1. Check ELF Magic: 0x7F 'E' 'L' 'F'
   if (data.length >= 64 && data[0] === 0x7f && data[1] === 0x45 && data[2] === 0x4c && data[3] === 0x46) {
     const is64 = data[4] === 2;
     const isLE = data[5] !== 2;
@@ -125,7 +124,6 @@ export function inspectBinaryHeaders(
         machine = `ELF Machine 0x${e_machine.toString(16)}`;
     }
 
-    // Check if `.symtab` string is present in binary
     const asciiText = new TextDecoder('latin1').decode(data.subarray(0, Math.min(data.length, 65536)));
     hasSymbols = asciiText.includes('.symtab');
     isStripped = !hasSymbols;
@@ -142,7 +140,7 @@ export function inspectBinaryHeaders(
       packerDetails = 'UPX Packer signature (UPX!) detected';
     }
   }
-  // 2. Check PE/COFF Magic: 'M' 'Z'
+
   else if (data.length >= 0x80 && data[0] === 0x4d && data[1] === 0x5a) {
     const peOff = dv.getUint32(0x3c, true);
     if (peOff + 24 <= data.length && data[peOff] === 0x50 && data[peOff + 1] === 0x45) {
@@ -200,7 +198,7 @@ export function inspectBinaryHeaders(
       }
     }
   }
-  // 3. Check Mach-O Magic
+
   else if (data.length >= 32) {
     const m = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]) >>> 0;
     if (m === 0xfeedfacf || m === 0xcffaedfe || m === 0xfeedface || m === 0xcefaedfe) {
@@ -241,7 +239,6 @@ export function inspectBinaryHeaders(
     }
   }
 
-  // Merge Rizin info if available
   if (rizinInfo && typeof rizinInfo === 'object') {
     const overview = (rizinInfo.overview ?? rizinInfo) as Record<string, any>;
     const bin = overview?.bin ?? (rizinInfo.binaryInfo as Record<string, any>) ?? {};

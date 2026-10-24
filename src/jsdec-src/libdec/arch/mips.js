@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2017-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Instruction from '../core/instruction.js';
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
@@ -60,10 +57,10 @@ import Long from '../long.js';
         if (arg[0].indexOf('-sym.') == 0 && arg[1] == 'gp') {
             return Base.assign(e.opd[0], arg[0].replace(/^-/, ''));
         } else if (arg[1] == '0') {
-            //pointer, register, bits, is_signed
+
             return Base.read_memory(arg[0], e.opd[0], bits, !unsigned);
         } else if (arg[0] == '0') {
-            //pointer, register, bits, is_signed
+
             return Base.read_memory(arg[1], e.opd[0], bits, !unsigned);
         }
         arg[0] = parseInt(arg[0]) / (bits / 8);
@@ -83,10 +80,10 @@ import Long from '../long.js';
         var e = instr.parsed;
         var arg = e.opd[1].replace(/\)/, '').split('(');
         if (arg[1] == '0') {
-            //pointer, register, bits, is_signed
+
             return Base.write_memory(arg[0], e.opd[0], bits, !unsigned);
         } else if (arg[0] == '0') {
-            //pointer, register, bits, is_signed
+
             return Base.write_memory(arg[1], e.opd[0], bits, !unsigned);
         }
         arg[0] = arg[0].length > 0 ? parseInt(arg[0]) : NaN;
@@ -173,7 +170,6 @@ import Long from '../long.js';
         instr.code = Base.assign(instr.parsed.opd[0], addr);
         return i;
     };
-
 
     var lw_jalr = function(instr, start, instructions, context) {
         var check = [
@@ -377,9 +373,7 @@ import Long from '../long.js';
             },
             'jr': function(instr, context, instructions) {
                 if (instr.parsed.opd.indexOf('ra') < 0) {
-                    /*
-                      _delayed_branch (instr, context, instructions);
-                    */
+
                     return Base.call(instr.parsed.opd);
                 }
                 var reg = null;
@@ -486,7 +480,7 @@ import Long from '../long.js';
             };
         },
         preanalisys: function(instructions) {
-            /* delayed branch fix */
+
             for (var i = 0; i < (instructions.length - 1); i++) {
                 var op = instructions[i].parsed.mnem;
                 if (_branch_list.indexOf(op) >= 0 && instructions[i + 1].parsed.mnem != 'nop') {
@@ -496,7 +490,7 @@ import Long from '../long.js';
             }
         },
         postanalisys: function(instructions, context) {
-            /* simplifies any load address 32/64 bit */
+
             for (var i = 0; i < instructions.length; i++) {
                 if (['sp'].indexOf(instructions[i].parsed.opd[0]) >= 0) {
                     instructions[i].valid = false;

@@ -107,7 +107,7 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-[#06090f]">
-      {/* Controls */}
+
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#182232] bg-[#0c121d] px-2.5 py-1 text-xs shrink-0 select-none">
         <div className="flex items-center gap-2">
           <form onSubmit={handleJump} className="flex items-center gap-1">
@@ -140,7 +140,6 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
           </form>
         </div>
 
-        {/* Section Quick Jump */}
         <div className="flex items-center gap-1">
           {sections.slice(0, 5).map((s) => (
             <button
@@ -176,7 +175,6 @@ export const HexViewerPane: React.FC<HexViewerPaneProps> = ({ data, sections, fo
         </div>
       </div>
 
-      {/* Hex Table */}
       <div className={`flex-1 overflow-auto p-2 text-xs leading-5 ${fontClass}`}>
         <div className="mb-1 flex border-b border-[#182232] pb-1 text-[11px] font-semibold text-[#64748b]">
           <span className="w-24">OFFSET</span>

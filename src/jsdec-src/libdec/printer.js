@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import JSONex from './JSONex.js';
 import Long from './long.js';
 import Anno from './annotation.js';
@@ -25,12 +22,7 @@ function initializeColors() {
         "text": config['usrcmt'] || 'yellow',
     };
 }
-//const _autoregex = /(\bif\b|\belse\b|\bwhile\b|\bfor\b|\bdo\b|\breturn\b|[ui]+nt[123468]+\_t|\bvoid\b|\bconst\b|\bsizeof\b|\bfloat\b|\bdouble\b|0x[0-9A-Fa-f]+|\b\d+\b)/g
 
-/**
- * Contains the regex used to colorize a given string. 
- * @type {Object}
- */
 const _autotheme = {
     controlflow: /\bif\b|\belse\b|\bwhile\b|\bfor\b|\bdo\b|\breturn\b|\bthrow\b/g,
     definebits: /[ui]+nt[123468]+_t|\bvoid\b|\bconst\b|\bsizeof\b|\bfloat\b|\bdouble\b|\bchar\b|\bwchar_t\b|\bextern\b|\bstruct\b|\bsize_t\b|\btime_t\b|\bboolean\b/g,
@@ -40,10 +32,6 @@ const _autotheme = {
 
 const defaulttheme = initializeColors();
 
-/**
- * Color types (ansi, nocolor)
- * @type {Object}
- */
 const Colors = {
     ansi: ColorsAnsi,
     text: ColorsInvalid,
@@ -51,13 +39,6 @@ const Colors = {
 
 var _theme_colors = Colors.text.make(defaulttheme);
 
-/**
- * Applies colors to the string given a certain regex
- * @param  {String} input - Input string
- * @param  {String} type  - Color name (ansi, text)
- * @param  {String} regex - Regex to apply
- * @return {String}       - Result string
- */
 var _apply_regex = function(input, type, regex) {
     var x = input.split(regex);
     var p = input.match(regex);
@@ -79,11 +60,6 @@ var _apply_regex = function(input, type, regex) {
     return s;
 };
 
-/**
- * Colorize the input string via ansi converters
- * @param  {String} input - Input string
- * @return {String}       - Result string
- */
 var _colorize_text = function(input) {
     if (!input || input.length < 1) {
         return '';
@@ -91,19 +67,19 @@ var _colorize_text = function(input) {
     if (!Global().evars.honor.color) {
         return input;
     }
-    /* control flow (if, else, while, do, etc..) */
+
     var x = input.split(_autotheme.controlflow);
     if (x.length > 1) {
         input = _apply_regex(input, 'flow', _autotheme.controlflow);
     }
-    /* numbers */
+
     x = input.split(_autotheme.numbers);
     if (x.length == 1 && x == '') {
         input = this.theme.integers(input);
     } else if (x.length > 1) {
         input = _apply_regex(input, 'integers', _autotheme.numbers);
     }
-    /* uint32_t, etc.. */
+
     x = input.split(_autotheme.definebits);
     if (x.length == 1 && x == '') {
         input = this.theme.types(input);
@@ -113,9 +89,6 @@ var _colorize_text = function(input) {
     return input;
 };
 
-/**
- * Applies all the colors options (theme/colors).
- */
 var _get_theme = function(evars) {
     if (evars.honor && evars.honor.color) {
         return Colors.ansi.make(defaulttheme);
@@ -123,10 +96,6 @@ var _get_theme = function(evars) {
     return Colors.text.make(defaulttheme);
 };
 
-/**
- * Prints the final jsdec output
- * @param useJSON - boolean whether to print as json
- */
 var _flush_output = function(lines, errors, log) {
     if (Global().evars.extra.annotation && lines) {
         var actx = Anno.context();
@@ -172,10 +141,6 @@ var _flush_output = function(lines, errors, log) {
     }
 };
 
-/**
- * Printer Object
- * @return {Function} - Printer object (to be called via `new Printer()`)
- */
 export default function() {
     this.theme = _get_theme(Global().evars);
     this.auto = _colorize_text;

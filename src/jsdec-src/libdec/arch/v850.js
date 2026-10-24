@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2018-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Base from '../core/base.js';
 import Variable from '../core/variable.js';
 
@@ -26,12 +23,12 @@ var _conditional = function(instr, context, type, zero) {
 };
 
 var load_bits = function(register, pointer, bits, signed) {
-	//pointer, register, bits, is_signed
+
 	return Base.read_memory(pointer, register, bits, signed);
 };
 
 var store_bits = function(register, pointer, bits, signed) {
-	//pointer, register, bits, is_signed
+
 	return Base.write_memory(pointer, register, bits, signed);
 };
 
@@ -91,11 +88,11 @@ export default {
 			return _conditional(instr, context, 'LE');
 		},
 		bnh: function(instr, context) {
-			//branch not higher = LE
+
 			return _conditional(instr, context, 'GT');
 		},
 		bh: function(instr, context) {
-			//branch higher = GT
+
 			return _conditional(instr, context, 'LE');
 		},
 		bge: function(instr, context) {
@@ -128,7 +125,7 @@ export default {
 		},
 		jmp: function(instr, context, instructions) {
 			if ((instructions.length - 1) == instructions.indexOf(instr)) {
-				//name, args, is_pointer, returns, bits
+
 				return Base.call(instr.parsed.opd[0], [], true, 'return');
 			}
 			return Base.nop();
@@ -137,8 +134,7 @@ export default {
 			return Base.nop();
 		},
 		'ld.b': function(instr) {
-			// ld.X 0x6c36[r4], r14
-			// ["ld.X","0x6c36","r4","r14"]
+
 			var addr = instr.parsed.opd[0];
 			var src = instr.parsed.opd[1];
 			var dst = instr.parsed.opd[2];
@@ -215,7 +211,7 @@ export default {
 			if (instr.parsed.opd[2] == '0') {
 				return Base.nop();
 			}
-			//value, bits, is_signed, is_pointer, is_memory
+
 			var n = Variable.local(instr.parsed.opd[0], 32, true);
 			return Base.multiply(instr.parsed.opd[2], instr.parsed.opd[1], n);
 		},
@@ -250,26 +246,26 @@ export default {
 			return Base.or(instr.parsed.opd[2], instr.parsed.opd[1], instr.parsed.opd[0]);
 		},
 		satadd: function(instr) {
-			// add with previous carry
+
 			return _common_math(instr.parsed, Base.add);
 		},
 		satsub: function(instr) {
-			// add with previous carry
+
 			return _common_math(instr.parsed, Base.subtract, false);
 		},
 		satsubi: function(instr) {
-			// add with previous carry
+
 			return _common_math(instr.parsed, Base.subtract, true);
 		},
 		satsubr: function(instr) {
-			// add with previous carry
+
 			return _common_math(instr.parsed, Base.subtract, true);
 		},
 		shl: function(instr) {
 			return _common_math(instr.parsed, Base.shift_left);
 		},
 		shr: function(instr) {
-			//logically shift right
+
 			return _common_math(instr.parsed, Base.shift_right);
 		},
 		setf: function(instr, context) {
@@ -337,8 +333,7 @@ export default {
 			return load_bits(dst, src + ' + ' + addr, 32, false);
 		},
 		'sst.b': function(instr) {
-			// st.X , r14, 0x6c36[r4]
-			// ["st.X","r14","0x6c36","r4"]
+
 			var dst = instr.parsed.opd[0];
 			var addr = instr.parsed.opd[1];
 			var src = instr.parsed.opd[2];
@@ -384,8 +379,7 @@ export default {
 			return store_bits(dst, src + ' + ' + addr, 32, false);
 		},
 		'st.b': function(instr) {
-			// st.X , r14, 0x6c36[r4]
-			// ["st.X","r14","0x6c36","r4"]
+
 			var dst = instr.parsed.opd[0];
 			var addr = instr.parsed.opd[1];
 			var src = instr.parsed.opd[2];

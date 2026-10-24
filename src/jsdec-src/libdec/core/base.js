@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2017-2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-FileCopyrightText: 2018-2019 elicn
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Cpp from '../db/cpp.js';
 import CCalls from '../db/c_calls.js';
 import Extra from './extra.js';
@@ -9,20 +5,10 @@ import Variable from './variable.js';
 import Condition from './condition.js';
 import Long from '../long.js';
 
-/**
- * Wraps a string with parenthesis.
- * @param {string} s A string to wrap
- * @returns {string} `s` wrapped by parenthesis
- */
 var parenthesize = function(s) {
 	return ['(', s, ')'].join('');
 };
 
-/**
- * Wraps a string with parenthesis only if it is complex.
- * @param {string} s A string to wrap
- * @returns {string} `s` wrapped by parenthesis if `s` is a complex string, and `s` otherwise
- */
 var autoParen = function(s) {
 	return (s.indexOf(' ') > (-1) ? parenthesize(s) : s);
 };
@@ -40,11 +26,6 @@ var _generic_asm = function(asm) {
 	};
 };
 
-/**
- * Unary expression
- * @constructor
- * @inner
- */
 var _uexpr = function(operator, operand) {
 	this.operator = operator;
 
@@ -52,7 +33,6 @@ var _uexpr = function(operator, operand) {
 		autoString(operand)
 	];
 
-	/** @returns {!string} */
 	this.toString = function() {
 		return [
 			this.operator,
@@ -61,15 +41,9 @@ var _uexpr = function(operator, operand) {
 	};
 };
 
-/**
- * Unary expression with postfix notation
- * @constructor
- * @inner
- */
 var _uexpr_pf = function(operator, operand) {
 	_uexpr.call(this, operator, [operand]);
 
-	/** @returns {!string} */
 	this.toString = function() {
 		return [
 			this.operands[0],
@@ -80,11 +54,6 @@ var _uexpr_pf = function(operator, operand) {
 
 _uexpr_pf.prototype = Object.create(_uexpr.prototype);
 
-/**
- * Binary expression
- * @constructor
- * @inner
- */
 var _bexpr = function(operator, lhand, rhand) {
 	this.operator = operator;
 
@@ -93,7 +62,6 @@ var _bexpr = function(operator, lhand, rhand) {
 		autoString(rhand)
 	];
 
-	/** @returns {!string} */
 	this.toString = function() {
 		return [
 			this.operands[0],
@@ -103,11 +71,6 @@ var _bexpr = function(operator, lhand, rhand) {
 	};
 };
 
-/**
- * Ternary expression
- * @constructor
- * @inner
- */
 var _texpr = function(operator1, operator2, operand1, operand2, operand3) {
 	this.operators = [operator1, operator2];
 
@@ -117,7 +80,6 @@ var _texpr = function(operator1, operator2, operand1, operand2, operand3) {
 		autoParen(autoString(operand3))
 	];
 
-	/** @returns {!string} */
 	this.toString = function() {
 		return [
 			this.operands[0],
@@ -306,7 +268,7 @@ var _generic_objc_call = function(object_this, function_name, function_arguments
 };
 
 export default {
-	/* COMMON */
+
 	assign: _assign,
 	cast: function(destination, source, type) {
 		return _assign(destination, new _cast(source, type));
@@ -314,7 +276,7 @@ export default {
 	nop: function(asm) {
 		return null;
 	},
-	/* JUMPS */
+
 	goto: function(label_or_address) {
 		return new _generic_goto(label_or_address);
 	},
@@ -330,7 +292,7 @@ export default {
 	continue: function(value) {
 		return new _generic_flow('continue');
 	},
-	/* BRANCHES */
+
 	conditional_assign: function(destination, source_a, source_b, cond, src_true, src_false) {
 		var condition = new Condition.convert(source_a, source_b, cond, false);
 
@@ -342,7 +304,7 @@ export default {
 
 		return _assign(destination, new _texpr('?', ':', condition.toString(), src_true, src_false));
 	},
-	/* MATH */
+
 	increase: function(destination, source) {
 		if (source == '1') {
 			return new _uexpr_pf('++', destination);
@@ -449,7 +411,7 @@ export default {
 
 		return _assign(destination, new _generic_call('BIT_MASK', [source_a, source_b]));
 	},
-	/* MEMORY */
+
 	read_memory: function(pointer, register, bits, is_signed) {
 		var value = (Extra.is.string(register) || Extra.is.number(register)) ? Variable.local(register.toString(), Extra.to.type(bits, is_signed)) : register;
 		var ptr = (Extra.is.number(pointer) || Long.isLong(pointer)) ? Variable.pointer('0x' + pointer.toString(16), Extra.to.type(bits, is_signed)) : pointer;
@@ -466,7 +428,7 @@ export default {
 		}
 		return _assign(ptr, value);
 	},
-	/* SPECIAL */
+
 	composed: function(instructions) {
 		return new function(composed) {
 			this.composed = composed;
@@ -492,14 +454,14 @@ export default {
 			};
 		}(data);
 	},
-	/* Object based langs */
+
 	method_call: function(object_this, method_separator, function_name, function_arguments, prefix, postfix) {
 		return new _generic_method_call(object_this, function_name, function_arguments, method_separator, prefix, postfix);
 	},
 	objc_call: function(object_this, function_name, function_arguments) {
 		return new _generic_objc_call(object_this, function_name, function_arguments);
 	},
-	/* Object based langs */
+
 	assign_to_object_field: function(destination, object, method_separator, field) {
 		return new _assign_object_field(destination, object, field, method_separator, false);
 	},
@@ -515,7 +477,7 @@ export default {
 	throw: function(value) {
 		return new _generic_throw(value);
 	},
-	/* UNKNOWN */
+
 	unknown: function(asm) {
 		return new _generic_asm(asm);
 	}

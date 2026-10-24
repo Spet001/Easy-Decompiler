@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2023 Giovanni Dante Grazioli <deroad@libero.it>
-// SPDX-License-Identifier: BSD-3-Clause
-
 import Long from './long.js';
 import JSONex from './JSONex.js';
 
@@ -32,7 +29,6 @@ function _new_evars(issue) {
     return evars;
 }
 
-// old graph has base64 encoded comments.
 function _fixup_old_graph(graph) {
     graph[0].blocks.forEach((block) => {
         block.ops.forEach((instr) => {
@@ -48,8 +44,7 @@ function _new_data(issue) {
     }
     let bits = issue.archbits || issue.bits || 32;
     if (bits) {
-        // if bits is in the issue then it has been decoded as a Long object.
-        // to override this is required to be converted to just an integer.
+
         bits = parseInt(bits.toString());
     }
     var testdata = {

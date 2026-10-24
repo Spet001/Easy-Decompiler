@@ -41,7 +41,7 @@ export function saveAppSettings(settings: AppSettings): void {
   try {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   } catch {
-    // Ignore quota error
+
   }
 }
 
@@ -72,7 +72,7 @@ export async function saveRecentFile(entry: RecentFileEntry): Promise<void> {
       tx.onerror = () => reject(tx.error);
     });
   } catch {
-    // Ignore IDB errors in restricted environments
+
   }
 }
 
@@ -103,7 +103,7 @@ export async function clearRecentFiles(): Promise<void> {
       tx.onerror = () => reject(tx.error);
     });
   } catch {
-    // Ignore
+
   }
 }
 
@@ -117,7 +117,7 @@ export async function saveProjectToDb(project: SavedProject): Promise<void> {
       tx.onerror = () => reject(tx.error);
     });
   } catch {
-    // Ignore
+
   }
 }
 
